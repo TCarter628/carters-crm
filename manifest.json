@@ -1,0 +1,26 @@
+{
+  "name": "Carter's Ranches CRM",
+  "short_name": "Carter's CRM",
+  "description": "Client management for Cotton Mesa, Sombrerito, and Apache Springs ranches",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1E1509",
+  "theme_color": "#152010",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "screenshots": []
+}
