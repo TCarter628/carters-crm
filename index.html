@@ -6,482 +6,340 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Carter's CRM">
-<meta name="theme-color" content="#152010">
-<meta name="description" content="Carter's Ranches — Client CRM">
+<meta name="theme-color" content="#1a2a1a">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="icon" href="icons/icon-192.png">
 <title>Carter's Ranches CRM</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* ── RESET & ROOT ── */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
-  --bark:#1E1509;--forest:#152010;--olive:#3D4B2E;--sage:#6E8057;
-  --tan:#C8A46A;--cream:#F4EBCF;--rust:#A84C1E;--gold:#D4A030;--muted:#8A9A78;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bg:#141f14; --surface:#1e2e1e; --surface2:#253525; --border:#2e422e; --border2:#3a523a;
+  --text:#e8f0e8; --text2:#a8baa8; --text3:#6a826a;
+  --accent:#c8a84a; --accent2:#a07830; --green:#4a9a4a; --red:#c05030; --gold:#d4a030;
+  --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
 }
-html,body{height:100%;overflow:hidden;background:var(--bark);}
-body{font-family:'Libre Baskerville',serif;color:var(--cream);
-  background-image:radial-gradient(ellipse at 10% 0%,rgba(61,75,46,.35) 0%,transparent 55%);
-  display:flex;flex-direction:column;}
+html,body{height:100%;overflow:hidden;background:var(--bg);}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);display:flex;flex-direction:column;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:var(--border2);}
 
-/* ── SCROLLBARS ── */
-::-webkit-scrollbar{width:3px;}
-::-webkit-scrollbar-thumb{background:var(--olive);border-radius:3px;}
-
-/* ── TYPOGRAPHY ── */
-.font-display{font-family:'Playfair Display',serif;}
-.font-mono{font-family:'Courier Prime',monospace;}
-
-/* ── LAYOUT ── */
 #app{display:flex;flex-direction:column;height:100%;padding-top:var(--safe-top);}
-#header{background:var(--forest);border-bottom:2px solid var(--tan);padding:12px 16px 10px;flex-shrink:0;box-shadow:0 2px 16px rgba(0,0,0,.5);}
+#header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;flex-shrink:0;}
 #main{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
-#bottom-nav{background:var(--forest);border-top:1px solid rgba(200,164,106,.25);display:flex;padding-bottom:var(--safe-bottom);flex-shrink:0;}
+#bottom-nav{background:var(--surface);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-bottom);flex-shrink:0;}
 
-/* ── HEADER ── */
-.header-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.brand{display:flex;align-items:center;gap:10px;}
-.brand-icon{font-size:22px;}
-.brand-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:var(--tan);}
-.brand-sub{font-family:'Courier Prime',monospace;font-size:7px;letter-spacing:2px;color:var(--sage);text-transform:uppercase;margin-top:1px;}
-.header-stats{display:flex;gap:8px;}
-.hstat{text-align:center;background:rgba(200,164,106,.07);border:1px solid rgba(200,164,106,.18);border-radius:4px;padding:2px 10px;}
-.hstat-n{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--gold);}
-.hstat-l{font-family:'Courier Prime',monospace;font-size:6px;letter-spacing:1.5px;color:var(--sage);text-transform:uppercase;}
-.sync-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:background .3s;}
-.sync-dot.saving{background:#D4A030;animation:pulse 1s infinite;}
-.sync-dot.saved{background:#80C880;}
-.sync-dot.idle{background:transparent;}
-.sync-dot.error{background:#E8855A;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hrow{display:flex;align-items:center;justify-content:space-between;}
+.brand{font-size:17px;font-weight:700;color:var(--accent);}
+.brand-sub{font-size:10px;color:var(--text3);margin-top:1px;}
+.hstats{display:flex;gap:14px;align-items:center;}
+.hstat{text-align:right;}
+.hstat-n{font-size:15px;font-weight:700;color:var(--gold);}
+.hstat-l{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
+.sync{width:7px;height:7px;border-radius:50%;background:transparent;transition:background .3s;flex-shrink:0;}
+.sync.saving{background:var(--gold);animation:pulse 1s infinite;}
+.sync.saved{background:var(--green);}
+.sync.error{background:var(--red);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ── BOTTOM NAV ── */
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:none;color:var(--muted);padding:10px 4px 8px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;}
-.nav-btn.active{color:var(--tan);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:none;color:var(--text3);padding:10px 4px 8px;cursor:pointer;font-size:9px;text-transform:uppercase;letter-spacing:.5px;transition:color .15s;}
+.nav-btn.active{color:var(--accent);}
 .nav-btn .ni{font-size:20px;line-height:1;}
-.nav-btn .nl{font-family:'Courier Prime',monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;}
-.nav-indicator{position:absolute;top:0;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--tan);border-radius:0 0 2px 2px;transition:opacity .15s;}
-.nav-btn:not(.active) .nav-indicator{opacity:0;}
-.nav-btn-wrap{flex:1;position:relative;}
+.nav-wrap{flex:1;position:relative;}
+.nav-bar{position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:var(--accent);border-radius:0 0 2px 2px;opacity:0;transition:opacity .15s;}
+.nav-btn.active .nav-bar{opacity:1;}
 
-/* ── VIEWS ── */
-.view{display:none;padding:14px 14px 20px;animation:fadeIn .18s ease;}
+.view{display:none;padding:14px 14px 80px;animation:fadeUp .15s ease;}
 .view.active{display:block;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── CARDS ── */
-.card{background:rgba(255,255,255,.04);border:1px solid rgba(200,164,106,.16);border-radius:10px;}
-.section-title{font-family:'Courier Prime',monospace;font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;border-bottom:1px solid rgba(200,164,106,.13);padding-bottom:5px;margin-bottom:10px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
+.sec-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text3);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
 
-/* ── CLIENT CARDS (list view) ── */
-.client-card{background:rgba(255,255,255,.04);border:1px solid rgba(200,164,106,.14);border-radius:10px;padding:13px 14px;margin-bottom:9px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;}
-.client-card:active{background:rgba(200,164,106,.08);transform:scale(.99);}
-.client-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-.client-name{font-weight:700;font-size:15px;color:var(--cream);}
-.client-sub{font-family:'Courier Prime',monospace;font-size:10px;color:var(--sage);margin-top:2px;}
-.client-card-mid{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
-.client-card-bot{display:flex;justify-content:space-between;align-items:center;}
-.client-rev{font-family:'Courier Prime',monospace;font-size:13px;color:var(--gold);font-weight:700;}
-.client-fu{font-family:'Courier Prime',monospace;font-size:9px;}
+.cl-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 14px;margin-bottom:8px;cursor:pointer;transition:background .1s;}
+.cl-card:active{background:var(--surface2);}
+.cl-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px;}
+.cl-name{font-size:16px;font-weight:600;color:var(--text);}
+.cl-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.cl-mid{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px;}
+.cl-bot{display:flex;justify-content:space-between;align-items:center;}
+.cl-rev{font-size:14px;font-weight:700;color:var(--gold);}
 
-/* ── CHIPS ── */
-.ranch-pill{display:inline-block;padding:2px 8px;border-radius:3px;font-family:'Courier Prime',monospace;font-size:8px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;}
-.ranch-cmr{background:rgba(212,160,48,.15);color:var(--gold);border:1px solid rgba(212,160,48,.35);}
-.ranch-som{background:rgba(155,107,58,.2);color:#D4956A;border:1px solid rgba(155,107,58,.4);}
-.ranch-apache{background:rgba(90,130,60,.2);color:#90C870;border:1px solid rgba(90,130,60,.4);}
-.status-chip{display:inline-block;padding:3px 8px;border-radius:3px;font-family:'Courier Prime',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;font-weight:700;}
-.class-chip{display:inline-block;padding:2px 8px;border-radius:3px;font-family:'Courier Prime',monospace;font-size:9px;}
+.chip{display:inline-block;padding:3px 9px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:.3px;border:1px solid;}
+.chip-cm{background:rgba(200,168,74,.1);color:#c8a84a;border-color:rgba(200,168,74,.28);}
+.chip-som{background:rgba(180,130,80,.1);color:#c89060;border-color:rgba(180,130,80,.28);}
+.chip-apache{background:rgba(80,160,80,.1);color:#70b870;border-color:rgba(80,160,80,.28);}
+.chip-class{background:rgba(255,255,255,.04);color:var(--text2);border-color:var(--border2);}
+.s-inquiry{background:rgba(130,130,200,.08);color:#9090d0;border-color:rgba(130,130,200,.28);}
+.s-hot{background:rgba(220,100,50,.1);color:#e07850;border-color:rgba(220,100,50,.28);}
+.s-waitlist{background:rgba(200,160,50,.1);color:#c8a030;border-color:rgba(200,160,50,.28);}
+.s-deposit{background:rgba(80,150,220,.1);color:#70b0e8;border-color:rgba(80,150,220,.28);}
+.s-booked{background:rgba(60,160,60,.1);color:#60c060;border-color:rgba(60,160,60,.28);}
+.s-vip{background:rgba(200,168,74,.12);color:#c8a84a;border-color:rgba(200,168,74,.35);}
+.s-cold{background:rgba(100,120,100,.08);color:#708070;border-color:rgba(100,120,100,.22);}
+.s-complete{background:rgba(80,160,80,.08);color:#70c070;border-color:rgba(80,160,80,.22);}
 
-/* ── SEARCH / FILTER ── */
-.search-bar{display:flex;gap:8px;margin-bottom:12px;}
-.search-input-wrap{flex:1;position:relative;}
-.search-input-wrap input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(200,164,106,.22);border-radius:8px;color:var(--cream);padding:10px 12px 10px 36px;font-family:'Libre Baskerville',serif;font-size:14px;outline:none;}
-.search-input-wrap input::placeholder{color:var(--muted);}
-.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--sage);font-size:14px;pointer-events:none;}
-.filter-btn{background:rgba(255,255,255,.05);border:1px solid rgba(200,164,106,.22);border-radius:8px;color:var(--sage);padding:0 13px;font-size:16px;cursor:pointer;}
-.filter-btn.active{border-color:var(--tan);color:var(--tan);background:rgba(200,164,106,.1);}
+.fab{position:fixed;right:18px;bottom:calc(68px + var(--safe-bottom) + 14px);width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:#1a1a0a;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(200,168,74,.32);cursor:pointer;z-index:50;transition:transform .1s;}
+.fab:active{transform:scale(.92);}
 
-/* ── STATUS FILTER PILLS ── */
-.filter-pills{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;margin-bottom:4px;-webkit-overflow-scrolling:touch;}
-.filter-pills::-webkit-scrollbar{display:none;}
-.fpill{flex-shrink:0;padding:5px 11px;border-radius:20px;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border:1px solid rgba(200,164,106,.2);color:var(--muted);background:transparent;transition:all .15s;}
-.fpill.active{border-color:var(--tan);color:var(--tan);background:rgba(200,164,106,.1);}
+.srch{position:relative;margin-bottom:10px;}
+.srch input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px 10px 36px;font-size:14px;outline:none;}
+.srch input:focus{border-color:var(--border2);}
+.srch input::placeholder{color:var(--text3);}
+.srch-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;font-size:14px;}
 
-/* ── FAB ── */
-.fab{position:fixed;right:18px;bottom:calc(70px + var(--safe-bottom) + 12px);width:52px;height:52px;border-radius:50%;background:var(--tan);border:none;color:var(--bark);font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(200,164,106,.4);cursor:pointer;z-index:50;transition:all .15s;}
-.fab:active{transform:scale(.93);background:var(--gold);}
+.pills{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch;}
+.pills::-webkit-scrollbar{display:none;}
+.pill{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--text3);background:transparent;text-transform:uppercase;letter-spacing:.5px;}
+.pill.active{border-color:var(--accent);color:var(--accent);background:rgba(200,168,74,.07);}
 
-/* ── FORMS ── */
-.form-field{margin-bottom:13px;}
-.form-label{font-family:'Courier Prime',monospace;font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:5px;}
-.form-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(200,164,106,.22);border-radius:8px;color:var(--cream);padding:11px 13px;font-family:'Libre Baskerville',serif;font-size:15px;outline:none;-webkit-appearance:none;transition:border-color .2s;}
-.form-input:focus{border-color:var(--tan);}
-.form-input[type=date]{color-scheme:dark;}
-select.form-input option{background:#1A2A12;}
-textarea.form-input{resize:none;min-height:90px;line-height:1.5;}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.class-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px;}
-.class-btn{padding:7px 11px;border-radius:6px;font-family:'Courier Prime',monospace;font-size:10px;background:transparent;border:1px solid rgba(200,164,106,.2);color:var(--sage);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;}
-.class-btn.sel{border-color:var(--tan);background:rgba(200,164,106,.14);color:var(--tan);}
-.class-btn-sub{color:rgba(138,154,120,.6);font-size:8px;display:block;margin-top:1px;}
+.ff{margin-bottom:12px;}
+.fl{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);display:block;margin-bottom:5px;}
+.fi{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:11px 13px;font-size:15px;outline:none;-webkit-appearance:none;}
+.fi:focus{border-color:var(--accent2);}
+.fi[type=date]{color-scheme:dark;}
+select.fi option{background:var(--surface2);}
+textarea.fi{resize:none;min-height:78px;line-height:1.5;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.cgrid{display:flex;flex-wrap:wrap;gap:6px;}
+.cbtn{padding:7px 10px;border-radius:6px;font-size:11px;background:transparent;border:1px solid var(--border);color:var(--text3);cursor:pointer;text-align:left;}
+.cbtn.sel{border-color:var(--accent);background:rgba(200,168,74,.08);color:var(--accent);}
+.cbtn-sub{font-size:9px;color:var(--text3);display:block;margin-top:2px;}
+.cbtn.sel .cbtn-sub{color:var(--accent2);}
 
-/* ── SHEET / MODAL ── */
-.sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;backdrop-filter:blur(4px);}
-.sheet-overlay.open{display:flex;flex-direction:column;justify-content:flex-end;}
-.sheet{background:var(--forest);border-radius:18px 18px 0 0;border-top:2px solid var(--tan);max-height:92vh;display:flex;flex-direction:column;padding-bottom:var(--safe-bottom);animation:sheetUp .25s ease;}
-@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.sheet-handle{width:36px;height:4px;background:rgba(200,164,106,.3);border-radius:2px;margin:10px auto 0;}
-.sheet-head{padding:14px 18px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(200,164,106,.15);}
-.sheet-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--tan);}
-.sheet-x{background:transparent;border:none;color:var(--sage);font-size:22px;cursor:pointer;padding:0;line-height:1;}
-.sheet-body{flex:1;overflow-y:auto;padding:16px 18px;-webkit-overflow-scrolling:touch;}
-.sheet-foot{padding:12px 18px;border-top:1px solid rgba(200,164,106,.12);display:flex;gap:10px;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;backdrop-filter:blur(3px);}
+.overlay.open{display:flex;flex-direction:column;justify-content:flex-end;}
+.sheet{background:var(--surface);border-radius:16px 16px 0 0;border-top:1px solid var(--border2);max-height:94vh;display:flex;flex-direction:column;padding-bottom:var(--safe-bottom);animation:sUp .22s ease;}
+@keyframes sUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sh{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:10px auto 0;}
+.shd{padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.sht{font-size:17px;font-weight:700;color:var(--text);}
+.shx{background:transparent;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;padding:0;}
+.shb{flex:1;overflow-y:auto;padding:16px 18px;-webkit-overflow-scrolling:touch;}
+.shf{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:10px;}
 
-/* ── DETAIL SHEET ── */
-.detail-section{margin-bottom:16px;}
-.detail-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(200,164,106,.06);font-size:14px;}
-.detail-row .k{color:var(--sage);}
-.detail-row .v{color:var(--cream);font-weight:700;text-align:right;max-width:200px;word-break:break-word;}
-.notes-box{background:rgba(0,0,0,.2);border:1px solid rgba(200,164,106,.12);border-radius:8px;padding:12px;font-size:13px;color:var(--cream);line-height:1.65;font-style:italic;}
-.dep-bar{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin-top:5px;}
-.dep-fill{height:100%;background:var(--gold);border-radius:3px;transition:width .4s;}
-.activity-item{display:flex;gap:8px;background:rgba(0,0,0,.15);border-radius:6px;padding:8px 10px;font-size:12px;margin-bottom:5px;}
-.activity-date{font-family:'Courier Prime',monospace;font-size:9px;color:var(--muted);white-space:nowrap;margin-top:2px;}
+.dr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.dr .k{color:var(--text3);}
+.dr .v{color:var(--text);font-weight:600;text-align:right;max-width:210px;word-break:break-word;}
+.nbox{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6;}
+.dbar{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:6px;}
+.dfill{height:100%;background:var(--gold);border-radius:3px;}
+.ai{display:flex;gap:10px;padding:8px 10px;background:var(--surface2);border-radius:6px;font-size:12px;margin-bottom:5px;}
+.ad{font-size:10px;color:var(--text3);white-space:nowrap;margin-top:1px;min-width:70px;}
 
-/* ── STATUS QUICK BTNS ── */
-.status-quick{display:flex;gap:6px;flex-wrap:wrap;}
-.sqbtn{padding:6px 10px;border-radius:6px;font-family:'Courier Prime',monospace;font-size:9px;cursor:pointer;transition:all .15s;letter-spacing:.5px;border:1px solid;}
+.sqw{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
+.sq{padding:6px 10px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid;}
 
-/* ── BUTTONS ── */
-.btn-primary{background:var(--tan);color:var(--bark);border:none;padding:13px;border-radius:10px;font-family:'Playfair Display',serif;font-weight:700;font-size:15px;cursor:pointer;flex:1;transition:background .2s;}
-.btn-primary:active{background:var(--gold);}
-.btn-ghost{background:transparent;border:1px solid rgba(200,164,106,.28);color:var(--sage);padding:13px;border-radius:10px;font-family:'Libre Baskerville',serif;font-size:14px;cursor:pointer;transition:all .2s;}
-.btn-ghost:active{border-color:var(--tan);color:var(--cream);}
-.btn-danger{background:transparent;border:1px solid rgba(200,80,80,.3);color:#E88080;padding:11px 14px;border-radius:8px;font-family:'Libre Baskerville',serif;font-size:13px;cursor:pointer;}
+.bp{background:var(--accent);color:#1a1a0a;border:none;padding:13px;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;flex:1;}
+.bp:active{background:var(--accent2);}
+.bg{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:13px;border-radius:10px;font-size:14px;cursor:pointer;}
+.bg:active{border-color:var(--accent);color:var(--text);}
+.bdel{background:transparent;border:1px solid rgba(200,80,60,.3);color:#d07060;padding:11px 16px;border-radius:8px;font-size:13px;cursor:pointer;}
 
-/* ── DASHBOARD ── */
-.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
-.kpi-card{padding:13px 14px;border-radius:10px;}
-.kpi-icon{font-size:18px;margin-bottom:4px;}
-.kpi-val{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
-.kpi-lbl{font-family:'Courier Prime',monospace;font-size:7px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
-.dash-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
-.dash-bar{flex:1;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
-.dash-bar-fill{height:100%;border-radius:2px;opacity:.8;}
+.kgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 14px;}
+.kv{font-size:22px;font-weight:700;margin-top:2px;}
+.kl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
 
-/* ── FOLLOW-UP CARDS ── */
-.fu-card{border-radius:10px;padding:12px 13px;margin-bottom:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.fu-card:active{opacity:.85;}
+.fu{border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;border:1px solid;}
+.fu:active{opacity:.8;}
 
-/* ── ACTIVITY TIMELINE ── */
-.act-line{position:absolute;left:13px;top:0;bottom:0;width:1px;background:rgba(200,164,106,.2);}
-.act-dot{width:26px;height:26px;border-radius:50%;background:rgba(200,164,106,.1);border:1px solid rgba(200,164,106,.28);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;position:relative;z-index:1;}
+.pscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px;}
+.pscroll::-webkit-scrollbar{display:none;}
+.pboard{display:flex;gap:10px;min-width:max-content;padding:2px 0;}
+.pcol{width:180px;}
+.pch{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:7px;margin-bottom:7px;border:1px solid;}
+.pct{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;flex:1;}
+.pcc{font-size:10px;background:rgba(0,0,0,.2);padding:1px 6px;border-radius:10px;color:var(--text3);}
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;cursor:pointer;}
+.pc:active{background:var(--surface2);}
+.pcn{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.pcr{font-size:12px;font-weight:700;color:var(--gold);margin-top:4px;}
 
-/* ── TOAST ── */
-#toast{position:fixed;bottom:calc(70px + var(--safe-bottom) + 8px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--forest);border:1px solid var(--tan);border-radius:20px;padding:9px 18px;color:var(--cream);font-size:13px;z-index:999;opacity:0;transition:all .28s;pointer-events:none;white-space:nowrap;}
+.iarea{width:100%;min-height:120px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:12px;font-size:13px;line-height:1.6;resize:none;outline:none;font-family:inherit;}
+.iarea:focus{border-color:var(--border2);}
+.iarea::placeholder{color:var(--text3);}
+.ifield{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.ifield:last-child{border-bottom:none;}
+.ifield .ik{color:var(--text3);}
+.ifield .iv{color:var(--text);font-weight:600;max-width:65%;text-align:right;}
+
+#toast{position:fixed;bottom:calc(68px + var(--safe-bottom) + 10px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:9px 18px;color:var(--text);font-size:13px;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* ── EMPTY STATE ── */
-.empty{text-align:center;padding:60px 20px;color:var(--sage);}
-.empty-icon{font-size:44px;margin-bottom:12px;}
-.empty-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--olive);}
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:500;}
+.lbar{width:100px;height:2px;background:var(--surface2);border-radius:2px;overflow:hidden;}
+.lfill{height:100%;background:var(--accent);border-radius:2px;animation:lp 1.2s ease-in-out infinite;}
+@keyframes lp{0%{width:0}100%{width:100%}}
 
-/* ── LOADING ── */
-#loading{position:fixed;inset:0;background:var(--bark);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:500;}
-.load-bar{width:100px;height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
-.load-fill{height:100%;background:var(--tan);border-radius:2px;animation:loadAnim 1.2s ease-in-out infinite;}
-@keyframes loadAnim{0%{width:0%}100%{width:100%}}
-
-/* ── PIPELINE (horizontal scroll) ── */
-.pipeline-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px;}
-.pipeline-scroll::-webkit-scrollbar{display:none;}
-.pipeline-board{display:flex;gap:10px;min-width:max-content;padding:2px;}
-.pipeline-col{width:190px;}
-.pipeline-col-head{display:flex;align-items:center;gap:5px;padding:7px 9px;border-radius:7px;margin-bottom:7px;border:1px solid;}
-.pipeline-col-title{font-family:'Courier Prime',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;font-weight:700;flex:1;}
-.pipeline-col-count{font-family:'Courier Prime',monospace;font-size:9px;background:rgba(0,0,0,.2);padding:1px 6px;border-radius:10px;}
-.pipeline-card{background:rgba(255,255,255,.04);border:1px solid rgba(200,164,106,.12);border-radius:7px;padding:9px 10px;margin-bottom:6px;cursor:pointer;}
-.pipeline-card:active{background:rgba(200,164,106,.07);}
-
-/* ── INSTALL BANNER ── */
-#install-banner{display:none;background:rgba(200,164,106,.1);border:1px solid rgba(200,164,106,.3);border-radius:10px;padding:12px 14px;margin:12px 14px 0;gap:10px;align-items:center;}
+#install-banner{display:none;background:rgba(200,168,74,.07);border:1px solid rgba(200,168,74,.22);border-radius:10px;padding:11px 13px;margin:10px 14px 0;gap:10px;align-items:center;}
 #install-banner.show{display:flex;}
-.install-banner-text{flex:1;font-size:12px;color:var(--cream);line-height:1.5;}
-.install-banner-btn{background:var(--tan);color:var(--bark);border:none;border-radius:6px;padding:7px 12px;font-family:'Playfair Display',serif;font-weight:700;font-size:11px;cursor:pointer;white-space:nowrap;}
 </style>
 </head>
 <body>
-
 <div id="loading">
-  <div style="font-size:38px">🦌</div>
-  <div style="font-family:'Playfair Display',serif;font-size:19px;color:#C8A46A;font-weight:700">Carter's Ranches</div>
-  <div style="font-family:'Courier Prime',monospace;font-size:9px;color:#6E8057;letter-spacing:3px;text-transform:uppercase">Loading CRM…</div>
-  <div class="load-bar"><div class="load-fill"></div></div>
+  <div style="font-size:42px">🦌</div>
+  <div style="font-size:18px;font-weight:700;color:var(--accent)">Carter's Ranches</div>
+  <div style="font-size:10px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;margin-top:-4px">Loading CRM</div>
+  <div class="lbar"><div class="lfill"></div></div>
 </div>
 
 <div id="app" style="display:none">
-  <!-- INSTALL BANNER -->
   <div id="install-banner">
     <span style="font-size:20px">📲</span>
-    <div class="install-banner-text"><strong style="color:#C8A46A">Add to Home Screen</strong><br>Install for quick access like a native app</div>
-    <button class="install-banner-btn" onclick="showInstallInstructions()">How?</button>
-    <button onclick="dismissInstall()" style="background:transparent;border:none;color:#6E8057;font-size:18px;cursor:pointer">✕</button>
+    <div style="flex:1;font-size:12px;color:var(--text2)"><strong style="color:var(--accent)">Install on iPhone</strong><br>Add to Home Screen for quick access</div>
+    <button style="background:var(--accent);color:#1a1a0a;border:none;border-radius:6px;padding:7px 12px;font-weight:700;font-size:11px;cursor:pointer" onclick="openSheet('installSheet')">How?</button>
+    <button onclick="dismissInstall()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer">✕</button>
   </div>
 
-  <!-- HEADER -->
   <div id="header">
-    <div class="header-row">
-      <div class="brand">
-        <span class="brand-icon">🦌</span>
-        <div>
-          <div class="brand-name">Carter's CRM</div>
-          <div class="brand-sub">Cotton Mesa · Sombrerito · Apache</div>
-        </div>
+    <div class="hrow">
+      <div>
+        <div class="brand">🦌 Carter's CRM</div>
+        <div class="brand-sub">Cotton Mesa · Sombrerito · Apache Springs</div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div class="header-stats">
-          <div class="hstat"><div class="hstat-n" id="hs-clients">0</div><div class="hstat-l">Clients</div></div>
-          <div class="hstat"><div class="hstat-n" id="hs-pipeline">$0K</div><div class="hstat-l">Pipeline</div></div>
-        </div>
-        <div class="sync-dot idle" id="sync-dot" title="Sync status"></div>
+      <div class="hstats">
+        <div class="hstat"><div class="hstat-n" id="hs-c">0</div><div class="hstat-l">Clients</div></div>
+        <div class="hstat"><div class="hstat-n" id="hs-p">$0K</div><div class="hstat-l">Pipeline</div></div>
+        <div class="sync" id="sync-dot"></div>
       </div>
     </div>
   </div>
 
-  <!-- MAIN -->
   <div id="main">
-    <!-- DASHBOARD -->
     <div class="view active" id="view-dashboard"></div>
-    <!-- CLIENTS -->
     <div class="view" id="view-clients"></div>
-    <!-- PIPELINE -->
     <div class="view" id="view-pipeline"></div>
-    <!-- FOLLOW-UPS -->
     <div class="view" id="view-followups"></div>
-    <!-- ACTIVITY -->
     <div class="view" id="view-activity"></div>
   </div>
 
-  <!-- FAB -->
   <button class="fab" id="fab" onclick="openAdd()">+</button>
 
-  <!-- BOTTOM NAV -->
   <nav id="bottom-nav">
-    <div class="nav-btn-wrap"><button class="nav-btn active" id="nav-dashboard" onclick="setView('dashboard')"><div class="nav-indicator"></div><span class="ni">📊</span><span class="nl">Home</span></button></div>
-    <div class="nav-btn-wrap"><button class="nav-btn" id="nav-clients" onclick="setView('clients')"><div class="nav-indicator"></div><span class="ni">👥</span><span class="nl">Clients</span></button></div>
-    <div class="nav-btn-wrap"><button class="nav-btn" id="nav-pipeline" onclick="setView('pipeline')"><div class="nav-indicator"></div><span class="ni">🔄</span><span class="nl">Pipeline</span></button></div>
-    <div class="nav-btn-wrap"><button class="nav-btn" id="nav-followups" onclick="setView('followups')"><div class="nav-indicator"></div><span class="ni">📅</span><span class="nl">F/U</span></button></div>
-    <div class="nav-btn-wrap"><button class="nav-btn" id="nav-activity" onclick="setView('activity')"><div class="nav-indicator"></div><span class="ni">📋</span><span class="nl">Log</span></button></div>
+    <div class="nav-wrap"><button class="nav-btn active" id="nav-dashboard" onclick="setView('dashboard')"><div class="nav-bar"></div><span class="ni">📊</span>Home</button></div>
+    <div class="nav-wrap"><button class="nav-btn" id="nav-clients" onclick="setView('clients')"><div class="nav-bar"></div><span class="ni">👥</span>Clients</button></div>
+    <div class="nav-wrap"><button class="nav-btn" id="nav-pipeline" onclick="setView('pipeline')"><div class="nav-bar"></div><span class="ni">🔄</span>Pipeline</button></div>
+    <div class="nav-wrap"><button class="nav-btn" id="nav-followups" onclick="setView('followups')"><div class="nav-bar"></div><span class="ni">📅</span>Follow-Up</button></div>
+    <div class="nav-wrap"><button class="nav-btn" id="nav-activity" onclick="setView('activity')"><div class="nav-bar"></div><span class="ni">📋</span>Log</button></div>
   </nav>
 </div>
 
 <!-- ADD/EDIT SHEET -->
-<div class="sheet-overlay" id="addSheet">
+<div class="overlay" id="addSheet">
   <div class="sheet" style="max-height:95vh">
-    <div class="sheet-handle"></div>
-    <div class="sheet-head">
-      <div class="sheet-title" id="sheet-title">New Client</div>
-      <button class="sheet-x" onclick="closeSheet('addSheet')">✕</button>
-    </div>
-    <div class="sheet-body">
-      <div class="form-field"><label class="form-label">Full Name *</label><input class="form-input" id="f-name" placeholder="e.g. Wade Garrison" autocomplete="name"></div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Phone</label><input class="form-input" id="f-phone" type="tel" placeholder="(555) 000-0000"></div>
-        <div class="form-field"><label class="form-label">State</label><input class="form-input" id="f-state" placeholder="TX"></div>
+    <div class="sh"></div>
+    <div class="shd"><div class="sht" id="sheet-title">New Client</div><button class="shx" onclick="closeSheet('addSheet')">✕</button></div>
+    <div class="shb">
+      <div class="ff"><label class="fl">Full Name *</label><input class="fi" id="f-name" placeholder="First Last"></div>
+      <div class="frow">
+        <div class="ff"><label class="fl">Phone</label><input class="fi" id="f-phone" type="tel" placeholder="(555) 000-0000"></div>
+        <div class="ff"><label class="fl">State</label><input class="fi" id="f-state" placeholder="TX"></div>
       </div>
-      <div class="form-field"><label class="form-label">Email</label><input class="form-input" id="f-email" type="email" placeholder="email@domain.com" autocomplete="email"></div>
-      <div class="form-row">
-        <div class="form-field">
-          <label class="form-label">Ranch *</label>
-          <select class="form-input" id="f-ranch" onchange="updateClassGrid()">
+      <div class="ff"><label class="fl">Email</label><input class="fi" id="f-email" type="email" placeholder="email@domain.com"></div>
+      <div class="frow">
+        <div class="ff"><label class="fl">Ranch</label>
+          <select class="fi" id="f-ranch" onchange="updateClassGrid()">
             <option value="Cotton Mesa">Cotton Mesa (Elk)</option>
             <option value="Sombrerito">Sombrerito (Whitetail)</option>
-            <option value="Apache Springs">Apache Springs (WT)</option>
+            <option value="Apache Springs">Apache Springs</option>
           </select>
         </div>
-        <div class="form-field">
-          <label class="form-label">Status</label>
-          <select class="form-input" id="f-status"></select>
-        </div>
+        <div class="ff"><label class="fl">Status</label><select class="fi" id="f-status"></select></div>
       </div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Deal Value ($)</label><input class="form-input" id="f-revenue" type="number" placeholder="16950" inputmode="numeric"></div>
-        <div class="form-field"><label class="form-label">Deposit Collected ($)</label><input class="form-input" id="f-deposit" type="number" placeholder="0" inputmode="numeric"></div>
+      <div class="frow">
+        <div class="ff"><label class="fl">Deal Value ($)</label><input class="fi" id="f-revenue" type="number" placeholder="0" inputmode="numeric"></div>
+        <div class="ff"><label class="fl">Deposit ($)</label><input class="fi" id="f-deposit" type="number" placeholder="0" inputmode="numeric"></div>
       </div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Season</label><input class="form-input" id="f-season" placeholder="Fall 2025"></div>
-        <div class="form-field"><label class="form-label">Party Size</label><input class="form-input" id="f-party" type="number" placeholder="1" value="1" inputmode="numeric"></div>
+      <div class="frow">
+        <div class="ff"><label class="fl">Season</label><input class="fi" id="f-season" placeholder="Fall 2026"></div>
+        <div class="ff"><label class="fl">Party Size</label><input class="fi" id="f-party" type="number" placeholder="1" value="1" inputmode="numeric"></div>
       </div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Waitlist #</label><input class="form-input" id="f-position" type="number" placeholder="e.g. 3" inputmode="numeric"></div>
-        <div class="form-field"><label class="form-label">Follow-Up Date</label><input class="form-input" id="f-followup" type="date"></div>
+      <div class="frow">
+        <div class="ff"><label class="fl">Waitlist #</label><input class="fi" id="f-position" type="number" placeholder="e.g. 3" inputmode="numeric"></div>
+        <div class="ff"><label class="fl">Follow-Up Date</label><input class="fi" id="f-followup" type="date"></div>
       </div>
-      <div class="form-field"><label class="form-label">Referral Source</label><input class="form-input" id="f-referral" placeholder="Returning, Instagram, Word of Mouth"></div>
-      <div class="form-field">
-        <label class="form-label">Hunt Class</label>
-        <div class="class-grid" id="classGrid"></div>
-      </div>
-      <div class="form-field"><label class="form-label">Notes</label><textarea class="form-input" id="f-notes" placeholder="Past hunts, preferences, guide preference, follow-up context…"></textarea></div>
+      <div class="ff"><label class="fl">Referral Source</label><input class="fi" id="f-referral" placeholder="Returning, Referral, Instagram…"></div>
+      <div class="ff"><label class="fl">Hunt Class</label><div class="cgrid" id="classGrid"></div></div>
+      <div class="ff"><label class="fl">Notes</label><textarea class="fi" id="f-notes" placeholder="Preferences, past hunts, guide requests…"></textarea></div>
     </div>
-    <div class="sheet-foot">
-      <button class="btn-ghost" onclick="closeSheet('addSheet')" style="flex:0 0 auto;padding:13px 18px">Cancel</button>
-      <button class="btn-primary" onclick="saveClient()">Save Client</button>
+    <div class="shf">
+      <button class="bg" onclick="closeSheet('addSheet')" style="flex:0 0 auto;padding:13px 18px">Cancel</button>
+      <button class="bp" onclick="saveClient()">Save Client</button>
     </div>
   </div>
 </div>
 
 <!-- DETAIL SHEET -->
-<div class="sheet-overlay" id="detailSheet">
+<div class="overlay" id="detailSheet">
   <div class="sheet" style="max-height:95vh">
-    <div class="sheet-handle"></div>
-    <div class="sheet-head">
+    <div class="sh"></div>
+    <div class="shd">
       <div>
-        <div class="sheet-title" id="dp-name"></div>
-        <div id="dp-meta" style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap"></div>
+        <div class="sht" id="dp-name"></div>
+        <div id="dp-meta" style="display:flex;gap:6px;margin-top:5px;flex-wrap:wrap"></div>
       </div>
-      <button class="sheet-x" onclick="closeSheet('detailSheet')">✕</button>
+      <button class="shx" onclick="closeSheet('detailSheet')">✕</button>
     </div>
-    <div class="sheet-body" id="dp-body"></div>
+    <div class="shb" id="dp-body"></div>
   </div>
 </div>
 
-<!-- INSTALL INSTRUCTIONS SHEET -->
-<div class="sheet-overlay" id="installSheet">
+<!-- EMAIL IMPORT SHEET -->
+<div class="overlay" id="importSheet">
+  <div class="sheet" style="max-height:95vh">
+    <div class="sh"></div>
+    <div class="shd"><div class="sht">📧 Import from Email</div><button class="shx" onclick="closeSheet('importSheet')">✕</button></div>
+    <div class="shb">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6">Copy and paste the full text of any email from a lead. AI will extract the client details automatically.</p>
+      <div class="ff">
+        <label class="fl">Paste Email Text</label>
+        <textarea class="iarea" id="import-text" placeholder="Paste the email here — subject, body, whatever you have. More text = better results.&#10;&#10;Example:&#10;From: John Smith &lt;jsmith@email.com&gt;&#10;Hi, interested in a Gold Medal elk hunt for Fall 2026, party of 2. My number is (555) 123-4567."></textarea>
+      </div>
+      <div id="import-status"></div>
+      <div id="import-preview" style="display:none">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Parsed — Review Before Saving</div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px" id="import-fields"></div>
+      </div>
+    </div>
+    <div class="shf" style="flex-direction:column;gap:8px">
+      <button class="bp" id="parse-btn" onclick="parseEmail()">Parse with AI</button>
+      <button class="bg" id="save-import-btn" onclick="saveImportedClient()" style="display:none">✅ Save as New Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- INSTALL SHEET -->
+<div class="overlay" id="installSheet">
   <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-head">
-      <div class="sheet-title">📲 Add to Home Screen</div>
-      <button class="sheet-x" onclick="closeSheet('installSheet')">✕</button>
-    </div>
-    <div class="sheet-body">
-      <p style="color:var(--cream);font-size:14px;line-height:1.7;margin-bottom:16px">Follow these steps to install Carter's CRM on your iPhone:</p>
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--tan);color:var(--bark);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:13px;flex-shrink:0">1</div>
-          <div style="color:var(--cream);font-size:14px;line-height:1.5">Open this page in <strong style="color:var(--tan)">Safari</strong> (not Chrome or another browser)</div>
-        </div>
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--tan);color:var(--bark);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:13px;flex-shrink:0">2</div>
-          <div style="color:var(--cream);font-size:14px;line-height:1.5">Tap the <strong style="color:var(--tan)">Share button</strong> <span style="font-size:16px">⬆️</span> at the bottom of Safari</div>
-        </div>
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--tan);color:var(--bark);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:13px;flex-shrink:0">3</div>
-          <div style="color:var(--cream);font-size:14px;line-height:1.5">Scroll down and tap <strong style="color:var(--tan)">"Add to Home Screen"</strong></div>
-        </div>
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--tan);color:var(--bark);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:13px;flex-shrink:0">4</div>
-          <div style="color:var(--cream);font-size:14px;line-height:1.5">Tap <strong style="color:var(--tan)">"Add"</strong> in the top right — done! 🎯</div>
-        </div>
-      </div>
-      <div style="margin-top:18px;background:rgba(200,164,106,.07);border:1px solid rgba(200,164,106,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--sage);line-height:1.6">
-        💡 The app icon will appear on your home screen. Your data syncs automatically — open it on your laptop too at the same URL and everything stays in sync.
+    <div class="sh"></div>
+    <div class="shd"><div class="sht">Add to Home Screen</div><button class="shx" onclick="closeSheet('installSheet')">✕</button></div>
+    <div class="shb">
+      <div style="display:flex;flex-direction:column;gap:16px;padding:4px 0">
+        ${[['1','Open this page in <strong style="color:var(--text)">Safari</strong> (not Chrome)'],['2','Tap the <strong style="color:var(--text)">Share ⬆️</strong> button at the bottom'],['3','Tap <strong style="color:var(--text)">"Add to Home Screen"</strong>'],['4','Tap <strong style="color:var(--text)">"Add"</strong> — done! 🎯']].map(([n,t])=>`<div style="display:flex;gap:14px;align-items:flex-start"><div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1a0a;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">${n}</div><div style="color:var(--text2);font-size:14px;line-height:1.5;padding-top:4px">${t}</div></div>`).join('')}
       </div>
     </div>
-    <div class="sheet-foot">
-      <button class="btn-primary" onclick="closeSheet('installSheet')">Got it!</button>
-    </div>
+    <div class="shf"><button class="bp" onclick="closeSheet('installSheet')">Got it</button></div>
   </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ── DATA ──────────────────────────────────────────────────────────────────
-const CMR=[{val:"Cow Hunt",label:"Cow Hunt",price:5450,score:'Cow'},{val:"Management Bull",label:"Mgmt Bull",price:9950,score:'Up to 260"'},{val:"Bronze Medal",label:"Bronze Medal",price:11950,score:'Up to 300"'},{val:"Silver Medal",label:"Silver Medal",price:13950,score:'301"–330"'},{val:"Gold Medal",label:"Gold Medal",price:16950,score:'331"–360"'},{val:"Platinum",label:"Platinum",price:19950,score:'361"–390"'},{val:"Lifetime",label:"Lifetime",price:23450,score:'391"–409"'},{val:"Lifetime Plus",label:"Lifetime Plus",price:26950,score:'410"–429"'},{val:"B&C Club",label:"B&C Club",price:28950,score:'430"–600"+'}];
-const SOM=[{val:"Silver Class",label:"Silver",price:4950,score:'Up to 140"'},{val:"Gold Class",label:"Gold",price:8450,score:'145"–154 7/8"'},{val:"Platinum Class",label:"Platinum",price:11450,score:'155"–164 7/8"'},{val:"Platinum Plus",label:"Plat Plus",price:13950,score:'165"–172 7/8"'},{val:"Lifetime Class",label:"Lifetime",price:17950,score:'173"–179 7/8"'},{val:"B&C Club (WT)",label:"B&C Club",price:20950,score:'180"+'}];
+const CMR=[{val:"Cow Hunt",label:"Cow Hunt",price:5450,score:'Cow'},{val:"Management Bull",label:"Mgmt Bull",price:9950,score:'Up to 260"'},{val:"Bronze Medal",label:"Bronze",price:11950,score:'Up to 300"'},{val:"Silver Medal",label:"Silver",price:13950,score:'301-330"'},{val:"Gold Medal",label:"Gold",price:16950,score:'331-360"'},{val:"Platinum",label:"Platinum",price:19950,score:'361-390"'},{val:"Lifetime",label:"Lifetime",price:23450,score:'391-409"'},{val:"Lifetime Plus",label:"Lifetime+",price:26950,score:'410-429"'},{val:"B&C Club",label:"B&C Club",price:28950,score:'430"+'}];
+const SOM=[{val:"Silver Class",label:"Silver",price:4950,score:'Up to 140"'},{val:"Gold Class",label:"Gold",price:8450,score:'145-154"'},{val:"Platinum Class",label:"Platinum",price:11450,score:'155-164"'},{val:"Platinum Plus",label:"Plat+",price:13950,score:'165-172"'},{val:"Lifetime Class",label:"Lifetime",price:17950,score:'173-179"'},{val:"B&C Club (WT)",label:"B&C Club",price:20950,score:'180"+'}];
 const APACHE=[{val:"Bronze (AS)",label:"Bronze",price:4000,score:"Entry"},{val:"Silver (AS)",label:"Silver",price:7500,score:"Mid"},{val:"Gold (AS)",label:"Gold",price:11000,score:"Trophy"},{val:"Platinum (AS)",label:"Platinum",price:14000,score:"Elite"}];
 const CLASS_SETS={"Cotton Mesa":CMR,"Sombrerito":SOM,"Apache Springs":APACHE};
-
 const STATUSES=[
-  {val:"inquiry",label:"Inquiry",icon:"📬",bg:"rgba(160,160,180,.15)",color:"#A0A0CC",border:"rgba(160,160,180,.3)"},
-  {val:"hot",label:"Hot Lead",icon:"🔥",bg:"rgba(212,74,30,.18)",color:"#E8855A",border:"rgba(212,74,30,.3)"},
-  {val:"waitlist",label:"Waitlist",icon:"⏳",bg:"rgba(212,160,48,.12)",color:"#D4A030",border:"rgba(212,160,48,.28)"},
-  {val:"deposit",label:"Deposit Paid",icon:"💰",bg:"rgba(100,160,220,.12)",color:"#90C0F0",border:"rgba(100,160,220,.28)"},
-  {val:"booked",label:"Fully Booked",icon:"✅",bg:"rgba(74,140,74,.12)",color:"#80C880",border:"rgba(74,140,74,.28)"},
-  {val:"vip",label:"VIP / Return",icon:"⭐",bg:"rgba(200,164,106,.18)",color:"#C8A46A",border:"rgba(200,164,106,.38)"},
-  {val:"cold",label:"Cold",icon:"🧊",bg:"rgba(110,128,87,.1)",color:"#6E8057",border:"rgba(110,128,87,.2)"},
-  {val:"complete",label:"Hunt Complete",icon:"🏆",bg:"rgba(100,180,100,.1)",color:"#70C870",border:"rgba(100,180,100,.25)"},
+  {val:"inquiry",label:"Inquiry",icon:"📬",cls:"s-inquiry"},
+  {val:"hot",label:"Hot Lead",icon:"🔥",cls:"s-hot"},
+  {val:"waitlist",label:"Waitlist",icon:"⏳",cls:"s-waitlist"},
+  {val:"deposit",label:"Deposit Paid",icon:"💰",cls:"s-deposit"},
+  {val:"booked",label:"Fully Booked",icon:"✅",cls:"s-booked"},
+  {val:"vip",label:"VIP / Return",icon:"⭐",cls:"s-vip"},
+  {val:"cold",label:"Cold",icon:"🧊",cls:"s-cold"},
+  {val:"complete",label:"Complete",icon:"🏆",cls:"s-complete"},
 ];
 const SM=Object.fromEntries(STATUSES.map(s=>[s.val,s]));
 
-const SEED = [
-  {id:1,name:'Brian Ehst',phone:'',email:'',state:'',ranch:'Cotton Mesa',status:'hot',position:1,huntClass:'Gold Medal',revenue:16950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:2,name:'Andy Porter',phone:'(260) 221-2699',email:'andy.b.porter44@gmail.com',state:'',ranch:'Cotton Mesa',status:'hot',position:2,huntClass:'Management Bull',revenue:9950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Management Bull'}]},
-  {id:3,name:'Doug Scott',phone:'(713) 855-4927',email:'doug@dms-solutions-inc.com',state:'',ranch:'Cotton Mesa',status:'hot',position:3,huntClass:'Gold Medal',revenue:33900,deposit:0,season:'Fall 2026',party:2,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:4,name:'Mike Lee',phone:'',email:'mlee@lhrservices.com',state:'',ranch:'Cotton Mesa',status:'hot',position:4,huntClass:'Gold Medal',revenue:16950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:5,name:'Mr. Hawkins',phone:'',email:'',state:'',ranch:'Cotton Mesa',status:'waitlist',position:5,huntClass:'Bronze Medal',revenue:11950,deposit:0,season:'Fall 2027',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Bronze Medal'}]},
-  {id:6,name:'Ken Dunn',phone:'',email:'kennethe.dunn1@gmail.com',state:'',ranch:'Cotton Mesa',status:'hot',position:6,huntClass:'Gold Medal',revenue:16950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:7,name:'John Soderman',phone:'',email:'-jcsoderman@yahoo.com',state:'',ranch:'Cotton Mesa',status:'hot',position:7,huntClass:'Management Bull',revenue:9950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Management Bull'}]},
-  {id:8,name:'Paul Oppegard',phone:'',email:'realestate2309@gmail.com',state:'',ranch:'Cotton Mesa',status:'hot',position:8,huntClass:'B&C Club',revenue:28950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — B&C Club'}]},
-  {id:9,name:'Kathaleen & Brian Dailey',phone:'',email:'',state:'',ranch:'Cotton Mesa',status:'hot',position:9,huntClass:'Bronze Medal',revenue:23900,deposit:0,season:'Fall 2026',party:2,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Bronze Medal'}]},
-  {id:10,name:'Brian Murphy',phone:'',email:'teammurphyhunting@yahoo.com',state:'',ranch:'Cotton Mesa',status:'hot',position:10,huntClass:'Silver Medal',revenue:13950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'Look up email chain before reaching out | Archery/bow interest',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Silver Medal'}]},
-  {id:11,name:'Kevin Dent',phone:'',email:'kdent3550@gmail.com',state:'',ranch:'Cotton Mesa',status:'hot',position:11,huntClass:'Management Bull',revenue:9950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Management Bull'}]},
-  {id:12,name:'Dale McMullen',phone:'',email:'dmcmullen@westsidelexus.com',state:'',ranch:'Cotton Mesa',status:'hot',position:12,huntClass:'Gold Medal',revenue:16950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:13,name:'Terri Hawkins',phone:'',email:'',state:'',ranch:'Cotton Mesa',status:'waitlist',position:13,huntClass:'Bronze Medal',revenue:23900,deposit:0,season:'Fall 2027',party:2,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Bronze Medal'}]},
-  {id:14,name:'Charlie Reinhardt',phone:'',email:'charliereinhardt@elliottelectric.com',state:'',ranch:'Cotton Mesa',status:'hot',position:14,huntClass:'Silver Medal',revenue:13950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Silver Medal'}]},
-  {id:15,name:'Howard Stephen',phone:'',email:'howard.stephen@att.net',state:'',ranch:'Cotton Mesa',status:'hot',position:15,huntClass:'Platinum',revenue:19950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'Long time Carters Country customer',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Platinum'}]},
-  {id:16,name:'Justin Johnson',phone:'',email:'justin.johnson@summitltc.com',state:'',ranch:'Cotton Mesa',status:'hot',position:16,huntClass:'Lifetime',revenue:55900,deposit:0,season:'Fall 2026',party:4,referral:'',notes:'(2) Silver + (2) Lifetime hunters. Hunted with Aron in AK.',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Lifetime'}]},
-  {id:17,name:'Colby Mueck',phone:'',email:'colby.mueck@gmail.com',state:'',ranch:'Cotton Mesa',status:'hot',position:17,huntClass:'Silver Medal',revenue:13950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Silver Medal'}]},
-  {id:18,name:'Rhett Dotson',phone:'',email:'',state:'',ranch:'Cotton Mesa',status:'hot',position:18,huntClass:'Cow Hunt',revenue:5450,deposit:0,season:'Fall 2026',party:2,referral:'',notes:'Father hunts, Rhett observes. No mount needed. Worked at ROSEN with Paige.',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Cow Hunt'}]},
-  {id:19,name:'Josh Marek',phone:'',email:'joshmarek@marekbros.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:19,huntClass:'Bronze Medal',revenue:11950,deposit:0,season:'Fall 2026',party:1,referral:'Returning',notes:'2024 return client',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Bronze Medal'}]},
-  {id:20,name:'Trae Downard',phone:'',email:'downard.trae@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:20,huntClass:'Gold Medal',revenue:16950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:21,name:'Brian Smith',phone:'(731) 571-8993',email:'',state:'',ranch:'Cotton Mesa',status:'inquiry',position:21,huntClass:'',revenue:0,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'Wheelchair/handicap hunt request',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — class TBD'}]},
-  {id:22,name:'Reagan Rentz',phone:'',email:'rrentz@rentzelectric.net',state:'',ranch:'Cotton Mesa',status:'inquiry',position:22,huntClass:'Lifetime',revenue:70350,deposit:0,season:'Fall 2026',party:3,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Lifetime'}]},
-  {id:23,name:'Kyle Parrish',phone:'(832) 217-5010',email:'kyleeparrish@yahoo.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:23,huntClass:'Gold Medal',revenue:33900,deposit:0,season:'Fall 2026',party:2,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:24,name:'Dustin Hoang',phone:'',email:'',state:'',ranch:'Cotton Mesa',status:'inquiry',position:24,huntClass:'Silver Medal',revenue:13950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'Paige/PC to send info first',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Silver Medal'}]},
-  {id:25,name:'Gary Stoker',phone:'',email:'gitrinec@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:25,huntClass:'Cow Hunt',revenue:5450,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'Veteran — discount requested',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Cow Hunt'}]},
-  {id:26,name:'Brock Malson',phone:'',email:'malsonbrock1993@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:26,huntClass:'Lifetime',revenue:46900,deposit:0,season:'Fall 2026',party:2,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Lifetime'}]},
-  {id:27,name:'Jeff Page',phone:'',email:'jpage@nhplc.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:27,huntClass:'Cow Hunt',revenue:5450,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'Paige/PC to send info first',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Cow Hunt'}]},
-  {id:28,name:'Bill Katzenberger',phone:'',email:'billkatzenberger@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:28,huntClass:'',revenue:0,deposit:0,season:'Fall 2027',party:1,referral:'',notes:'Archery/bow interest',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — class TBD'}]},
-  {id:29,name:'Gerardo Sanchez',phone:'',email:'guerosanchez@icloud.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:29,huntClass:'B&C Club',revenue:115800,deposit:0,season:'Fall 2026',party:4,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — B&C Club'}]},
-  {id:30,name:'Mike Lance',phone:'',email:'sales@bowhangersolutions.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:30,huntClass:'Gold Medal',revenue:16950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:31,name:'Travis Lewis',phone:'',email:'lewistravis854@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:31,huntClass:'Silver Medal',revenue:13950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Silver Medal'}]},
-  {id:32,name:'Rick Kapitan',phone:'',email:'rakapitan@live.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:32,huntClass:'Gold Medal',revenue:16950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:33,name:'Austin Simpson',phone:'',email:'simpsonrcllc@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:33,huntClass:'',revenue:0,deposit:0,season:'Fall 2026',party:3,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — class TBD'}]},
-  {id:34,name:'Billy Lott',phone:'',email:'belindaclott@icloud.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:34,huntClass:'',revenue:0,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — class TBD'}]},
-  {id:35,name:'Sam Sciortino',phone:'(985)-351-6857',email:'shsciortino@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:35,huntClass:'Bronze Medal',revenue:23900,deposit:0,season:'Fall 2026',party:2,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Bronze Medal'}]},
-  {id:36,name:'Keith Hayward',phone:'',email:'',state:'',ranch:'Cotton Mesa',status:'inquiry',position:36,huntClass:'Management Bull',revenue:19900,deposit:0,season:'Fall 2026',party:2,referral:'',notes:'1-day meat hunt — 2 Cows/Mgmt',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Management Bull'}]},
-  {id:37,name:'Jett Massey',phone:'',email:'masseyjett09@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:37,huntClass:'B&C Club',revenue:28950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — B&C Club'}]},
-  {id:38,name:'Steven Huff',phone:'',email:'huffwelding@yahoo.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:38,huntClass:'Silver Medal',revenue:13950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Silver Medal'}]},
-  {id:39,name:'Luther Olson',phone:'',email:'luke@olsonproperties.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:39,huntClass:'Gold Medal',revenue:16950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:40,name:'Kirk Jonovich',phone:'(602) 714-0692',email:'kirkjonovich@yahoo.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:40,huntClass:'Lifetime Plus',revenue:107800,deposit:0,season:'Fall 2026',party:4,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Lifetime Plus'}]},
-  {id:41,name:'Andrew Seamans',phone:'',email:'silverkingfish5@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:41,huntClass:'Silver Medal',revenue:13950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'Archery/bow interest',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Silver Medal'}]},
-  {id:42,name:'Clay Thomas',phone:'',email:'',state:'',ranch:'Cotton Mesa',status:'inquiry',position:42,huntClass:'Platinum',revenue:79800,deposit:0,season:'Fall 2026',party:4,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Platinum'}]},
-  {id:43,name:'Robert (Bob) Mabry',phone:'',email:'bob18d2md@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:43,huntClass:'Cow Hunt',revenue:5450,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Cow Hunt'}]},
-  {id:44,name:'Phillip Hughes',phone:'',email:'phil@7seasmediagroup.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:44,huntClass:'Management Bull',revenue:9950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'Also interested in photo/video pricing',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Management Bull'}]},
-  {id:45,name:'Josh Davis',phone:'',email:'joshldavis@me.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:45,huntClass:'Lifetime Plus',revenue:53900,deposit:0,season:'Fall 2026',party:2,referral:'',notes:'Spoke last year — tried to get on 2025 schedule',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Lifetime Plus'}]},
-  {id:46,name:'Darick Hartsell',phone:'',email:'darickhartsell@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:46,huntClass:'Gold Medal',revenue:16950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:47,name:'Austin Simpson',phone:'',email:'simpsonrcllc@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:47,huntClass:'',revenue:0,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'Paige/PC to send info first',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — class TBD'}]},
-  {id:48,name:'David Grayson',phone:'',email:'dgrayson2347@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:48,huntClass:'',revenue:0,deposit:0,season:'Fall 2026',party:2,referral:'Referral',notes:'Todd Ayer\'s referral',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — class TBD'}]},
-  {id:49,name:'Kurt Freeman',phone:'',email:'kfreeman@us.ci.org',state:'',ranch:'Cotton Mesa',status:'inquiry',position:49,huntClass:'Silver Medal',revenue:97650,deposit:0,season:'Fall 2026',party:7,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Silver Medal'}]},
-  {id:50,name:'Doug Western',phone:'',email:'dwestern1@yahoo.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:50,huntClass:'Gold Medal',revenue:16950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:51,name:'Mason Hein',phone:'',email:'dgrayson2347@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:51,huntClass:'Platinum',revenue:19950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Platinum'}]},
-  {id:52,name:'Mike McCurdie',phone:'',email:'mcmcc60@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:52,huntClass:'Cow Hunt',revenue:5450,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Cow Hunt'}]},
-  {id:53,name:'Shawn Moe',phone:'',email:'bkermoe13@aol.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:53,huntClass:'Lifetime Plus',revenue:26950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Lifetime Plus'}]},
-  {id:54,name:'Sammy McDaniel',phone:'',email:'rsammymcdaniel@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:54,huntClass:'Lifetime',revenue:23450,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Lifetime'}]},
-  {id:55,name:'Luke Olson',phone:'',email:'luke@olsonproperties.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:55,huntClass:'',revenue:0,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'Paige/PC to send info first',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — class TBD'}]},
-  {id:56,name:'Kason Smeltzer',phone:'',email:'smeltzerkason@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:56,huntClass:'Management Bull',revenue:9950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'Paige/PC to send info first',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Management Bull'}]},
-  {id:57,name:'Tyler Scott',phone:'',email:'tyler@realcapanalytics.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:57,huntClass:'',revenue:0,deposit:0,season:'Fall 2026',party:5,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — class TBD'}]},
-  {id:58,name:'Wayne Dickson',phone:'',email:'wayned1997@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:58,huntClass:'Management Bull',revenue:19900,deposit:0,season:'Fall 2026',party:2,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Management Bull'}]},
-  {id:59,name:'Tim Clemens',phone:'',email:'timclemens@icloud.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:59,huntClass:'Platinum',revenue:19950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'Has observer coming',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Platinum'}]},
-  {id:60,name:'Chad Dammen',phone:'',email:'cadmontana@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:60,huntClass:'Lifetime',revenue:23450,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Lifetime'}]},
-  {id:61,name:'James Meinhart',phone:'',email:'jpmeinhart@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:61,huntClass:'Gold Medal',revenue:16950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:62,name:'Sean McGuire',phone:'(412) 651-1458',email:'s_mcquirepropainting@yahoo.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:62,huntClass:'',revenue:0,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — class TBD'}]},
-  {id:63,name:'Brady Hawkins',phone:'',email:'brady.hawkins41@gmail.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:63,huntClass:'Bronze Medal',revenue:11950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Bronze Medal'}]},
-  {id:64,name:'Ken Karls',phone:'(608) 279-9164',email:'krkarls@live.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:64,huntClass:'Gold Medal',revenue:16950,deposit:0,season:'Fall 2026',party:1,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Gold Medal'}]},
-  {id:65,name:'Mason Weathermon',phone:'',email:'mweatherson@me.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:65,huntClass:'Management Bull',revenue:19900,deposit:0,season:'Fall 2026',party:2,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Management Bull'}]}
-];
-
-const SK="carters_crm_v5";
-let clients=[],nextId=9,currentView="dashboard",statusFilter="all",huntFilter=null,searchQ="",editId=null,detailId=null;
-
-const todayStr=()=>new Date().toISOString().split("T")[0];
-const fmt$=n=>n?"$"+Number(n).toLocaleString():"—";
-
-// ── SUPABASE ──────────────────────────────────────────────────────────────
 const SB_URL='https://wlmfomuyrzpqmxwpdnyy.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsbWZvbXV5cnpwcW14d3Bkbnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc5NDUsImV4cCI6MjA4NzM0Mzk0NX0.tmyXMbb3a_Jtb-tb_S2G4olJvwz3ADtcA_8SfJRiqSE';
 
@@ -491,456 +349,401 @@ async function sbFetch(path,opts){
   if(!res.ok){const e=await res.text();throw new Error(e);}
   return res.status===204?null:res.json();
 }
-function clientToDb(c){return{id:c.id,name:c.name,phone:c.phone||'',email:c.email||'',state:c.state||'',ranch:c.ranch||'Cotton Mesa',status:c.status||'inquiry',position:c.position||null,hunt_class:c.huntClass||'',revenue:c.revenue||0,deposit:c.deposit||0,season:c.season||'',party:c.party||1,referral:c.referral||'',notes:c.notes||'',follow_up_date:c.followUpDate||null,added_date:c.addedDate||new Date().toISOString().split('T')[0],activity:c.activity||[]};}
-function dbToClient(r){return{id:r.id,name:r.name,phone:r.phone||'',email:r.email||'',state:r.state||'',ranch:r.ranch||'Cotton Mesa',status:r.status||'inquiry',position:r.position,huntClass:r.hunt_class||'',revenue:r.revenue||0,deposit:r.deposit||0,season:r.season||'',party:r.party||1,referral:r.referral||'',notes:r.notes||'',followUpDate:r.follow_up_date||'',addedDate:r.added_date||'',activity:r.activity||[]};}
+function c2db(c){return{id:c.id,name:c.name,phone:c.phone||'',email:c.email||'',state:c.state||'',ranch:c.ranch||'Cotton Mesa',status:c.status||'inquiry',position:c.position||null,hunt_class:c.huntClass||'',revenue:c.revenue||0,deposit:c.deposit||0,season:c.season||'',party:c.party||1,referral:c.referral||'',notes:c.notes||'',follow_up_date:c.followUpDate||null,added_date:c.addedDate||todayStr(),activity:c.activity||[]};}
+function db2c(r){return{id:r.id,name:r.name,phone:r.phone||'',email:r.email||'',state:r.state||'',ranch:r.ranch||'Cotton Mesa',status:r.status||'inquiry',position:r.position,huntClass:r.hunt_class||'',revenue:r.revenue||0,deposit:r.deposit||0,season:r.season||'',party:r.party||1,referral:r.referral||'',notes:r.notes||'',followUpDate:r.follow_up_date||'',addedDate:r.added_date||'',activity:r.activity||[]};}
 
 async function loadData(){
   try{
     const rows=await sbFetch('/rest/v1/clients?select=*&order=position.asc.nullslast');
-    if(rows&&rows.length>0){clients=rows.map(dbToClient);nextId=Math.max(...clients.map(c=>c.id))+1;}
-    else{clients=SEED;nextId=SEED.length+1;toast('No data found in database');}
-  }catch(e){console.error('Load error:',e);clients=SEED;nextId=SEED.length+1;toast('Offline mode');}
+    if(rows&&rows.length>0){clients=rows.map(db2c);nextId=Math.max(...clients.map(c=>c.id))+1;}
+    else{clients=[];nextId=1;toast('No clients found');}
+  }catch(e){console.error('Load:',e);clients=[];nextId=1;toast('Could not connect — check network');}
 }
-async function saveClient_db(c){setSyncStatus('saving');try{await sbFetch('/rest/v1/clients?id=eq.'+c.id,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify(clientToDb(c))});setSyncStatus('saved');setTimeout(()=>setSyncStatus('idle'),2000);}catch(e){console.error('Save:',e);setSyncStatus('error');setTimeout(()=>setSyncStatus('idle'),3000);}}
-async function insertClient_db(c){setSyncStatus('saving');try{await sbFetch('/rest/v1/clients',{method:'POST',prefer:'return=minimal',body:JSON.stringify(clientToDb(c))});setSyncStatus('saved');setTimeout(()=>setSyncStatus('idle'),2000);}catch(e){console.error('Insert:',e);setSyncStatus('error');}}
-async function deleteClient_db(id){setSyncStatus('saving');try{await sbFetch('/rest/v1/clients?id=eq.'+id,{method:'DELETE'});setSyncStatus('saved');setTimeout(()=>setSyncStatus('idle'),2000);}catch(e){console.error('Delete:',e);setSyncStatus('error');}}
+async function save_db(c){setSS('saving');try{await sbFetch('/rest/v1/clients?id=eq.'+c.id,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify(c2db(c))});setSS('saved');setTimeout(()=>setSS(''),2000);}catch(e){setSS('error');setTimeout(()=>setSS(''),3000);}}
+async function insert_db(c){setSS('saving');try{await sbFetch('/rest/v1/clients',{method:'POST',prefer:'return=minimal',body:JSON.stringify(c2db(c))});setSS('saved');setTimeout(()=>setSS(''),2000);}catch(e){setSS('error');}}
+async function delete_db(id){setSS('saving');try{await sbFetch('/rest/v1/clients?id=eq.'+id,{method:'DELETE'});setSS('saved');setTimeout(()=>setSS(''),2000);}catch(e){setSS('error');}}
 
-let saveTimer=null;
-async function saveData(){
-  setSyncStatus("saving");
-  const payload=JSON.stringify({clients,nextId});
-  try{
-    if(window.storage)await window.storage.set(SK,payload);
-    localStorage.setItem(SK,payload); // also keep local copy
-    setSyncStatus("saved");setTimeout(()=>setSyncStatus("idle"),2000);
-  }catch(e){setSyncStatus("error");setTimeout(()=>setSyncStatus("idle"),3000);}
-}
-function debouncedSave(){
-  if(saveTimer)clearTimeout(saveTimer);
-  saveTimer=setTimeout(saveData,800);
-}
+let clients=[],nextId=1,currentView='dashboard',statusFilter='all',searchQ='',editId=null;
+let parsedImport=null;
+const todayStr=()=>new Date().toISOString().split('T')[0];
+const fmt$=n=>n?'$'+Number(n).toLocaleString():'—';
+const rCls=r=>r==='Sombrerito'?'chip-som':r==='Apache Springs'?'chip-apache':'chip-cm';
+const rShort=r=>r==='Apache Springs'?'Apache Spgs':r;
+function schip(s){const st=SM[s]||SM.inquiry;return`<span class="chip ${st.cls}">${st.icon} ${st.label}</span>`;}
+function cchip(v){return v?`<span class="chip chip-class">${v}</span>`:'';}
+function fuClr(d){if(!d)return'var(--text3)';const t=todayStr();return d<t?'#e07850':d===t?'#c8a030':'var(--text3)';}
+function fuIcon(d){if(!d)return'';const t=todayStr();return d<t?'🚨 ':d===t?'📅 ':'⏰ ';}
+function setSS(s){const d=document.getElementById('sync-dot');d.className='sync'+(s?' '+s:'');}
+function toast(msg){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2800);}
 
-function setSyncStatus(s){
-  const d=document.getElementById("sync-dot");
-  d.className="sync-dot "+s;
-}
-
-// ── HELPERS ───────────────────────────────────────────────────────────────
-function chipStyleStr(val=""){
-  const v=val.toLowerCase();
-  if(v.includes("cow"))return"background:rgba(122,140,106,.15);color:#9AB48A;border:1px solid rgba(122,140,106,.3)";
-  if(v.includes("mgmt")||v.includes("management"))return"background:rgba(90,60,30,.3);color:#C8906A;border:1px solid rgba(155,107,58,.3)";
-  if(v.includes("bronze"))return"background:rgba(139,90,50,.25);color:#D4A070;border:1px solid rgba(175,120,70,.4)";
-  if(v.includes("silver"))return"background:rgba(160,160,160,.15);color:#C8C8C8;border:1px solid rgba(160,160,160,.3)";
-  if(v.includes("gold"))return"background:rgba(212,160,48,.15);color:#D4A030;border:1px solid rgba(212,160,48,.4)";
-  if(v.includes("platinum plus"))return"background:rgba(140,170,200,.15);color:#90B8D8;border:1px solid rgba(140,170,200,.3)";
-  if(v.includes("platinum"))return"background:rgba(180,200,220,.12);color:#A8C8E8;border:1px solid rgba(180,200,220,.3)";
-  if(v.includes("lifetime plus"))return"background:rgba(180,50,20,.2);color:#F08060;border:1px solid rgba(180,50,20,.35)";
-  if(v.includes("lifetime"))return"background:rgba(212,74,30,.15);color:#E8906A;border:1px solid rgba(212,74,30,.3)";
-  if(v.includes("b&c")||v.includes("bc club"))return"background:rgba(212,74,30,.25);color:#FF9060;border:1px solid rgba(212,74,30,.5)";
-  return"background:rgba(110,128,87,.15);color:#8A9A78;border:1px solid rgba(110,128,87,.3)";
-}
-function chipH(val){if(!val)return'<span style="color:#8A9A78;font-size:10px">—</span>';return`<span class="class-chip" style="${chipStyleStr(val)}">${val}</span>`;}
-function ranchCls(r){return r==="Sombrerito"?"ranch-som":r==="Apache Springs"?"ranch-apache":"ranch-cmr";}
-function ranchShort(r){return r==="Apache Springs"?"Apache Spgs":r;}
-function statusH(s){const st=SM[s]||SM.cold;return`<span class="status-chip" style="background:${st.bg};color:${st.color};border:1px solid ${st.border}">${st.icon} ${st.label}</span>`;}
-function fuColor(d){if(!d)return"#8A9A78";const t=todayStr();return d<t?"#E8855A":d===t?"#D4A030":"#8A9A78";}
-function fuIcon(d){if(!d)return"";const t=todayStr();return d<t?"🚨 ":d===t?"📅 ":"⏰ ";}
-
-function toast(msg){const e=document.getElementById("toast");e.textContent=msg;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2600);}
-
-// ── VIEW ──────────────────────────────────────────────────────────────────
 function setView(v){
   currentView=v;
-  document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
-  document.getElementById("view-"+v).classList.add("active");
-  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
-  document.getElementById("nav-"+v).classList.add("active");
-  // Hide FAB on pipeline/activity
-  document.getElementById("fab").style.display=["pipeline","activity"].includes(v)?"none":"flex";
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('nav-'+v).classList.add('active');
+  document.getElementById('fab').style.display=['pipeline','activity'].includes(v)?'none':'flex';
   render();
 }
-
 function render(){
   updateHeader();
-  if(currentView==="dashboard")renderDash();
-  else if(currentView==="clients")renderClients();
-  else if(currentView==="pipeline")renderPipeline();
-  else if(currentView==="followups")renderFollowups();
-  else if(currentView==="activity")renderActivity();
+  if(currentView==='dashboard')renderDash();
+  else if(currentView==='clients')renderClients();
+  else if(currentView==='pipeline')renderPipeline();
+  else if(currentView==='followups')renderFollowups();
+  else if(currentView==='activity')renderActivity();
 }
-
 function updateHeader(){
-  const pipeline=clients.reduce((s,c)=>s+(c.revenue||0),0);
-  document.getElementById("hs-clients").textContent=clients.length;
-  document.getElementById("hs-pipeline").textContent="$"+Math.round(pipeline/1000)+"K";
+  const pipe=clients.reduce((s,c)=>s+(c.revenue||0),0);
+  document.getElementById('hs-c').textContent=clients.length;
+  document.getElementById('hs-p').textContent='$'+Math.round(pipe/1000)+'K';
 }
-
-// ── STATS ──────────────────────────────────────────────────────────────────
 function getStats(){
-  const pipeline=clients.reduce((s,c)=>s+(c.revenue||0),0);
-  const collected=clients.reduce((s,c)=>s+(c.deposit||0),0);
-  const byStatus={all:clients.length};
-  STATUSES.forEach(s=>{byStatus[s.val]=clients.filter(c=>c.status===s.val).length;});
   const tod=todayStr();
-  const overdue=clients.filter(c=>c.followUpDate&&c.followUpDate<tod&&!["complete","cold"].includes(c.status));
-  const dueToday=clients.filter(c=>c.followUpDate===tod);
-  const dueSoon=clients.filter(c=>{if(!c.followUpDate)return false;const d=(new Date(c.followUpDate)-new Date())/86400000;return d>0&&d<=7;});
-  const noDue=clients.filter(c=>!c.followUpDate&&!["cold","complete"].includes(c.status));
-  return{pipeline,collected,balance:pipeline-collected,byStatus,overdue,dueToday,dueSoon,noDue};
+  const byStatus={};STATUSES.forEach(s=>{byStatus[s.val]=clients.filter(c=>c.status===s.val).length;});
+  return{
+    byStatus,
+    overdue:clients.filter(c=>c.followUpDate&&c.followUpDate<tod&&!['complete','cold'].includes(c.status)),
+    dueToday:clients.filter(c=>c.followUpDate===tod),
+    dueSoon:clients.filter(c=>{if(!c.followUpDate)return false;const d=(new Date(c.followUpDate)-new Date())/86400000;return d>0&&d<=7;}),
+    noDue:clients.filter(c=>!c.followUpDate&&!['cold','complete'].includes(c.status)),
+    pipeline:clients.reduce((s,c)=>s+(c.revenue||0),0),
+    collected:clients.reduce((s,c)=>s+(c.deposit||0),0),
+  };
 }
 
-// ── DASHBOARD ──────────────────────────────────────────────────────────────
 function renderDash(){
   const s=getStats();
   const kpis=[
-    {icon:"📈",val:fmt$(s.pipeline),label:"Pipeline",color:"#D4A030"},
-    {icon:"💵",val:fmt$(s.collected),label:"Collected",color:"#80C880"},
-    {icon:"⚖️",val:fmt$(s.balance),label:"Balance Due",color:"#E8906A"},
-    {icon:"🚨",val:s.overdue.length,label:"Overdue F/U",color:s.overdue.length>0?"#E8855A":"#6E8057"},
-    {icon:"⏳",val:s.byStatus.waitlist||0,label:"Waitlisted",color:"#D4A030"},
-    {icon:"💰",val:s.byStatus.deposit||0,label:"Deposits",color:"#90C0F0"},
+    {l:'Pipeline',v:fmt$(s.pipeline),c:'var(--gold)'},
+    {l:'Collected',v:fmt$(s.collected),c:'#60c060'},
+    {l:'Balance Due',v:fmt$(s.pipeline-s.collected),c:s.pipeline-s.collected>0?'#e07850':'#60c060'},
+    {l:'Overdue F/U',v:s.overdue.length,c:s.overdue.length>0?'#e07850':'var(--text3)'},
   ];
-  let fu="";
-  if(s.overdue.length===0&&s.dueToday.length===0&&s.dueSoon.length===0){
-    fu='<div style="text-align:center;padding:16px;color:#6E8057;font-style:italic;font-size:13px">All clear! 🎯</div>';
+  let fuH='';
+  if(s.overdue.length===0&&s.dueToday.length===0){
+    fuH='<div style="padding:10px 0;color:var(--text3);font-size:13px">All caught up ✓</div>';
   }else{
-    s.overdue.slice(0,2).forEach(c=>{fu+=`<div onclick="openDetail(${c.id})" style="cursor:pointer;padding:9px 10px;background:rgba(212,74,30,.07);border:1px solid rgba(212,74,30,.2);border-radius:7px;margin-bottom:7px"><div style="font-weight:700;font-size:13px;color:#F4EBCF">${c.name}</div><div style="font-family:'Courier Prime',monospace;font-size:9px;color:#E8855A">🚨 OVERDUE · ${c.followUpDate}</div></div>`;});
-    s.dueToday.slice(0,2).forEach(c=>{fu+=`<div onclick="openDetail(${c.id})" style="cursor:pointer;padding:9px 10px;background:rgba(212,160,48,.07);border:1px solid rgba(212,160,48,.2);border-radius:7px;margin-bottom:7px"><div style="font-weight:700;font-size:13px;color:#F4EBCF">${c.name}</div><div style="font-family:'Courier Prime',monospace;font-size:9px;color:#D4A030">📅 TODAY</div></div>`;});
-    s.dueSoon.slice(0,3).forEach(c=>{fu+=`<div onclick="openDetail(${c.id})" style="cursor:pointer;padding:8px 10px;border-radius:7px;margin-bottom:6px"><div style="font-size:13px;color:#F4EBCF">${c.name}</div><div style="font-family:'Courier Prime',monospace;font-size:9px;color:#8A9A78">⏰ ${c.followUpDate}</div></div>`;});
+    [...s.overdue.slice(0,3),...s.dueToday.slice(0,3)].forEach(c=>{
+      const ov=c.followUpDate<todayStr();
+      fuH+=`<div onclick="openDetail(${c.id})" style="cursor:pointer;padding:9px 10px;background:${ov?'rgba(220,100,50,.06)':'rgba(200,160,50,.06)'};border:1px solid ${ov?'rgba(220,100,50,.22)':'rgba(200,160,50,.22)'};border-radius:8px;margin-bottom:6px">
+        <div style="font-weight:600;font-size:14px">${c.name}</div>
+        <div style="font-size:11px;color:${ov?'#e07850':'#c8a030'};margin-top:3px">${ov?'🚨 OVERDUE':'📅 Due Today'} · ${c.followUpDate}</div>
+      </div>`;
+    });
   }
-  const topClasses={};clients.forEach(c=>{if(c.huntClass)topClasses[c.huntClass]=(topClasses[c.huntClass]||0)+1;});
-  const top=Object.entries(topClasses).sort((a,b)=>b[1]-a[1]).slice(0,4);
-  document.getElementById("view-dashboard").innerHTML=`
-    <div class="kpi-grid">${kpis.map(k=>`<div class="card kpi-card"><div class="kpi-icon">${k.icon}</div><div class="kpi-val" style="color:${k.color}">${k.val}</div><div class="kpi-lbl">${k.label}</div></div>`).join("")}</div>
-    <div class="card" style="padding:13px 14px;margin-bottom:12px">
-      <div class="section-title">Pipeline by Status</div>
-      ${STATUSES.map(st=>{const n=s.byStatus[st.val]||0;const pct=clients.length?Math.round(n/clients.length*100):0;return`<div class="dash-bar-row" onclick="statusFilter='${st.val}';setView('clients')" style="cursor:pointer"><span style="font-size:11px">${st.icon}</span><span style="font-size:12px;color:#F4EBCF;flex:1">${st.label}</span><div class="dash-bar"><div class="dash-bar-fill" style="width:${pct}%;background:${st.color}"></div></div><span style="font-family:'Courier Prime',monospace;font-size:11px;color:${st.color};min-width:16px;text-align:right">${n}</span></div>`;}).join("")}
+  document.getElementById('view-dashboard').innerHTML=`
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button onclick="openSheet('importSheet')" style="background:var(--surface);border:1px solid var(--border2);border-radius:8px;color:var(--accent);padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">📧 Import Email</button>
     </div>
-    <div class="card" style="padding:13px 14px;margin-bottom:12px">
-      <div class="section-title">Follow-Ups Due</div>
-      ${fu}
+    <div class="kgrid">${kpis.map(k=>`<div class="kpi"><div class="kv" style="color:${k.c}">${k.v}</div><div class="kl">${k.l}</div></div>`).join('')}</div>
+    <div class="card">
+      <div class="sec-label">Pipeline by Status</div>
+      ${STATUSES.map(st=>{const n=s.byStatus[st.val]||0;const pct=clients.length?Math.round(n/clients.length*100):0;return`<div onclick="statusFilter='${st.val}';setView('clients')" style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer"><div style="width:100px;font-size:13px;flex-shrink:0">${st.icon} ${st.label}</div><div style="flex:1;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden"><div style="width:${pct}%;height:100%;background:var(--border2);border-radius:2px"></div></div><div style="font-size:12px;font-weight:700;min-width:20px;text-align:right">${n}</div></div>`;}).join('')}
     </div>
-    ${top.length?`<div class="card" style="padding:13px 14px"><div class="section-title">Top Hunt Classes</div><div style="display:flex;flex-wrap:wrap;gap:8px">${top.map(([cls,n])=>`<div onclick="huntFilter='${cls}';setView('clients')" style="cursor:pointer;display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:1px solid rgba(200,164,106,.13);border-radius:8px;padding:8px 12px"><span class="class-chip" style="${chipStyleStr(cls)}">${cls}</span><span style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#D4A030">${n}</span></div>`).join("")}</div></div>`:""}
-  `;
+    <div class="card">
+      <div class="sec-label">Follow-Ups Due</div>
+      ${fuH}
+    </div>
+    <div class="card">
+      <div class="sec-label">Quick Actions</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="openAdd()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text2);padding:10px 14px;font-size:13px;cursor:pointer">+ New Client</button>
+        <button onclick="openSheet('importSheet')" style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text2);padding:10px 14px;font-size:13px;cursor:pointer">📧 Import Email</button>
+        <button onclick="statusFilter='hot';setView('clients')" style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text2);padding:10px 14px;font-size:13px;cursor:pointer">🔥 Hot Leads</button>
+        <button onclick="setView('followups')" style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text2);padding:10px 14px;font-size:13px;cursor:pointer">📅 Follow-Ups</button>
+      </div>
+    </div>`;
 }
 
-// ── CLIENTS ────────────────────────────────────────────────────────────────
 function renderClients(){
   let d=[...clients];
-  if(statusFilter!=="all")d=d.filter(c=>c.status===statusFilter);
-  if(huntFilter)d=d.filter(c=>c.huntClass===huntFilter);
-  if(searchQ){const q=searchQ.toLowerCase();d=d.filter(c=>c.name.toLowerCase().includes(q)||(c.notes||"").toLowerCase().includes(q)||(c.huntClass||"").toLowerCase().includes(q)||(c.ranch||"").toLowerCase().includes(q)||(c.state||"").toLowerCase().includes(q)||(c.phone||"").includes(q));}
-  d.sort((a,b)=>{let av=a.position??9999,bv=b.position??9999;return av-bv;});
-
-  const pills=[{f:"all",l:"All"},{f:"inquiry",l:"Inquiry"},{f:"hot",l:"🔥 Hot"},{f:"waitlist",l:"⏳ Wait"},{f:"deposit",l:"💰 Deposit"},{f:"booked",l:"✅ Booked"},{f:"vip",l:"⭐ VIP"},{f:"cold",l:"🧊 Cold"},{f:"complete",l:"🏆 Done"}];
-  const pillsH=pills.map(p=>`<button class="fpill${statusFilter===p.f?" active":""}" onclick="statusFilter='${p.f}';renderClients()">${p.l} <span style="opacity:.7">${p.f==="all"?clients.length:(clients.filter(c=>c.status===p.f).length)}</span></button>`).join("");
-
-  const cards=d.length===0?'<div class="empty"><div class="empty-icon">🎯</div><div class="empty-title">No clients match</div></div>':d.map(c=>`
-    <div class="client-card" onclick="openDetail(${c.id})">
-      <div class="client-card-top">
-        <div>
-          <div class="client-name">${c.name}</div>
-          <div class="client-sub">${c.phone||""}${c.state?" · "+c.state:""}</div>
-        </div>
-        ${statusH(c.status)}
+  if(statusFilter!=='all')d=d.filter(c=>c.status===statusFilter);
+  if(searchQ){const q=searchQ.toLowerCase();d=d.filter(c=>[c.name,c.phone,c.email,c.huntClass,c.ranch,c.state,c.notes].some(f=>(f||'').toLowerCase().includes(q)));}
+  d.sort((a,b)=>(a.position??9999)-(b.position??9999));
+  const pills=[{f:'all',l:'All '+clients.length},...STATUSES.map(s=>({f:s.val,l:s.icon+' '+s.label.split(' ')[0]+' '+clients.filter(c=>c.status===s.val).length}))];
+  const cards=d.length===0
+    ?'<div style="text-align:center;padding:50px 20px;color:var(--text3)"><div style="font-size:36px;margin-bottom:10px">👥</div><div style="font-size:15px">No clients match</div></div>'
+    :d.map(c=>`<div class="cl-card" onclick="openDetail(${c.id})">
+      <div class="cl-top">
+        <div><div class="cl-name">${c.name}</div><div class="cl-sub">${[c.phone,c.state].filter(Boolean).join(' · ')||'—'}</div></div>
+        ${schip(c.status)}
       </div>
-      <div class="client-card-mid">
-        <span class="ranch-pill ${ranchCls(c.ranch)}">${ranchShort(c.ranch)}</span>
-        ${c.huntClass?chipH(c.huntClass):""}
+      <div class="cl-mid"><span class="chip ${rCls(c.ranch)}">${rShort(c.ranch)}</span>${cchip(c.huntClass)}</div>
+      <div class="cl-bot">
+        <span class="cl-rev">${fmt$(c.revenue)}</span>
+        ${c.followUpDate?`<span style="font-size:10px;color:${fuClr(c.followUpDate)}">${fuIcon(c.followUpDate)}${c.followUpDate}</span>`:''}
       </div>
-      <div class="client-card-bot">
-        <span class="client-rev">${fmt$(c.revenue)}</span>
-        ${c.followUpDate?`<span class="client-fu" style="color:${fuColor(c.followUpDate)}">${fuIcon(c.followUpDate)}${c.followUpDate}</span>`:""}
-      </div>
-    </div>`).join("");
-
-  document.getElementById("view-clients").innerHTML=`
-    <div class="search-bar">
-      <div class="search-input-wrap">
-        <span class="search-icon">🔍</span>
-        <input placeholder="Search clients…" value="${searchQ}" oninput="searchQ=this.value;renderClients()">
-      </div>
-    </div>
-    <div class="filter-pills">${pillsH}</div>
+    </div>`).join('');
+  document.getElementById('view-clients').innerHTML=`
+    <div class="srch"><span class="srch-icon">🔍</span><input placeholder="Search name, phone, class…" value="${searchQ}" oninput="searchQ=this.value;renderClients()"></div>
+    <div class="pills">${pills.map(p=>`<button class="pill${statusFilter===p.f?' active':''}" onclick="statusFilter='${p.f}';renderClients()">${p.l}</button>`).join('')}</div>
     ${cards}`;
 }
 
-// ── PIPELINE ───────────────────────────────────────────────────────────────
 function renderPipeline(){
   const cols=STATUSES.map(col=>{
     const cc=clients.filter(c=>c.status===col.val);
     const rev=cc.reduce((s,c)=>s+(c.revenue||0),0);
-    const cards=cc.length===0?`<div style="border:1px dashed rgba(200,164,106,.12);border-radius:7px;padding:16px 10px;text-align:center;color:#8A9A78;font-size:11px;font-style:italic">Empty</div>`:cc.map(c=>`
-      <div class="pipeline-card" onclick="openDetail(${c.id})">
-        <div style="font-weight:700;font-size:13px;color:#F4EBCF;margin-bottom:4px">${c.name}</div>
-        <span class="ranch-pill ${ranchCls(c.ranch)}">${ranchShort(c.ranch)}</span>
-        ${c.huntClass?`<div style="margin-top:4px">${chipH(c.huntClass)}</div>`:""}
-        ${c.revenue?`<div style="font-family:'Courier Prime',monospace;font-size:11px;color:#D4A030;font-weight:700;margin-top:4px">${fmt$(c.revenue)}</div>`:""}
-        ${c.followUpDate?`<div style="font-family:'Courier Prime',monospace;font-size:9px;color:${fuColor(c.followUpDate)};margin-top:3px">${fuIcon(c.followUpDate)}${c.followUpDate}</div>`:""}
-      </div>`).join("");
-    return`<div class="pipeline-col">
-      <div class="pipeline-col-head" style="border-color:${col.border}">
-        <span>${col.icon}</span>
-        <span class="pipeline-col-title" style="color:${col.color}">${col.label}</span>
-        <span class="pipeline-col-count" style="color:#8A9A78">${cc.length}</span>
-      </div>
-      ${rev>0?`<div style="font-family:'Courier Prime',monospace;font-size:9px;color:#D4A030;margin-bottom:5px;padding-left:2px">${fmt$(rev)}</div>`:""}
+    const cards=cc.length===0
+      ?`<div style="border:1px dashed var(--border);border-radius:7px;padding:14px;text-align:center;font-size:11px;color:var(--text3)">Empty</div>`
+      :cc.map(c=>`<div class="pc" onclick="openDetail(${c.id})">
+        <div class="pcn">${c.name}</div>
+        <span class="chip ${rCls(c.ranch)}" style="font-size:9px">${rShort(c.ranch)}</span>
+        ${c.huntClass?`<div style="margin-top:4px">${cchip(c.huntClass)}</div>`:''}
+        ${c.revenue?`<div class="pcr">${fmt$(c.revenue)}</div>`:''}
+        ${c.followUpDate?`<div style="font-size:10px;color:${fuClr(c.followUpDate)};margin-top:3px">${fuIcon(c.followUpDate)}${c.followUpDate}</div>`:''}
+      </div>`).join('');
+    return`<div class="pcol">
+      <div class="pch ${col.cls}"><span>${col.icon}</span><span class="pct">${col.label}</span><span class="pcc">${cc.length}</span></div>
+      ${rev>0?`<div style="font-size:10px;color:var(--gold);margin-bottom:5px">${fmt$(rev)}</div>`:''}
       ${cards}
     </div>`;
-  }).join("");
-  document.getElementById("view-pipeline").innerHTML=`<div class="pipeline-scroll"><div class="pipeline-board">${cols}</div></div>`;
+  }).join('');
+  document.getElementById('view-pipeline').innerHTML=`<div class="pscroll"><div class="pboard">${cols}</div></div>`;
 }
 
-// ── FOLLOW-UPS ──────────────────────────────────────────────────────────────
 function renderFollowups(){
-  const s=getStats();
   const tod=todayStr();
+  const s=getStats();
   const fuCard=(c,hl)=>{
-    const bdr=hl==="overdue"?"rgba(212,74,30,.4)":hl==="today"?"rgba(212,160,48,.4)":hl==="none"?"rgba(110,128,87,.2)":"rgba(200,164,106,.15)";
-    const bg=hl==="overdue"?"rgba(212,74,30,.05)":hl==="today"?"rgba(212,160,48,.05)":"rgba(255,255,255,.025)";
-    return`<div class="fu-card" onclick="openDetail(${c.id})" style="background:${bg};border:1px solid ${bdr}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">
-        <div style="font-weight:700;font-size:14px;color:#F4EBCF">${c.name}</div>
-        ${statusH(c.status)}
+    const bdr=hl==='over'?'rgba(220,100,50,.3)':hl==='today'?'rgba(200,160,50,.3)':'var(--border)';
+    const bg=hl==='over'?'rgba(220,100,50,.05)':hl==='today'?'rgba(200,160,50,.05)':'var(--surface)';
+    return`<div class="fu" onclick="openDetail(${c.id})" style="background:${bg};border-color:${bdr}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div style="font-size:15px;font-weight:600">${c.name}</div>${schip(c.status)}
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:5px">
-        <span class="ranch-pill ${ranchCls(c.ranch)}">${ranchShort(c.ranch)}</span>
-        ${c.huntClass?chipH(c.huntClass):""}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+        <span class="chip ${rCls(c.ranch)}">${rShort(c.ranch)}</span>${cchip(c.huntClass)}
       </div>
-      <div style="font-family:'Courier Prime',monospace;font-size:10px;color:${c.followUpDate?fuColor(c.followUpDate):"#E8855A"}">${c.followUpDate?fuIcon(c.followUpDate)+"Follow-up: "+c.followUpDate:"⚠️ No follow-up scheduled"}</div>
-      ${c.phone?`<div style="font-family:'Courier Prime',monospace;font-size:10px;color:#6E8057;margin-top:3px">📞 ${c.phone}</div>`:""}
+      <div style="font-size:11px;color:${c.followUpDate?fuClr(c.followUpDate):'#e07850'}">${c.followUpDate?fuIcon(c.followUpDate)+'Follow-up: '+c.followUpDate:'⚠️ No follow-up date set'}</div>
+      ${c.phone?`<div style="font-size:11px;color:var(--text3);margin-top:3px">📞 ${c.phone}</div>`:''}
     </div>`;
   };
-  let html="";
-  const sec=(title,color,items,hl)=>{if(!items.length)return"";return`<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:${color||"#F4EBCF"};margin-bottom:8px">${title}</div>${items.map(c=>fuCard(c,hl)).join("")}<div style="height:8px"></div>`;};
-  html+=sec(`🚨 Overdue (${s.overdue.length})`,"#E8855A",s.overdue,"overdue");
-  html+=sec(`📅 Due Today (${s.dueToday.length})`,"#D4A030",s.dueToday,"today");
-  html+=sec(`⏰ This Week (${s.dueSoon.length})`,"#F4EBCF",s.dueSoon,"soon");
-  const sched=clients.filter(c=>c.followUpDate&&c.followUpDate>=tod).sort((a,b)=>a.followUpDate.localeCompare(b.followUpDate));
-  html+=sec("📋 All Scheduled","#F4EBCF",sched,"");
-  html+=sec(`⚠️ No Follow-Up Set (${s.noDue.length})`,"#8A9A78",s.noDue,"none");
-  document.getElementById("view-followups").innerHTML=html||'<div class="empty"><div class="empty-icon">🎯</div><div class="empty-title">All clear!</div></div>';
+  let html='';
+  const sec=(title,color,items,hl)=>{if(!items.length)return'';return`<div style="font-size:14px;font-weight:700;color:${color};margin-bottom:8px;margin-top:6px">${title}</div>${items.map(c=>fuCard(c,hl)).join('')}`;};
+  html+=sec(`🚨 Overdue (${s.overdue.length})`,'#e07850',s.overdue,'over');
+  html+=sec(`📅 Due Today (${s.dueToday.length})`,'#c8a030',s.dueToday,'today');
+  html+=sec(`⏰ This Week (${s.dueSoon.length})`,'var(--text)',s.dueSoon,'soon');
+  const allSched=clients.filter(c=>c.followUpDate&&c.followUpDate>=tod).sort((a,b)=>a.followUpDate.localeCompare(b.followUpDate));
+  if(allSched.length)html+=sec(`📋 All Scheduled (${allSched.length})`,'var(--text2)',allSched,'');
+  if(s.noDue.length)html+=sec(`⚠️ No Date Set (${s.noDue.length})`,'var(--text3)',s.noDue,'none');
+  document.getElementById('view-followups').innerHTML=html||'<div style="text-align:center;padding:50px;color:var(--text3)"><div style="font-size:36px;margin-bottom:10px">✅</div>All caught up!</div>';
 }
 
-// ── ACTIVITY ────────────────────────────────────────────────────────────────
 function renderActivity(){
-  const all=clients.flatMap(c=>(c.activity||[]).map(a=>({...a,cid:c.id,cname:c.name,ranch:c.ranch,status:c.status}))).sort((a,b)=>b.date.localeCompare(a.date));
-  document.getElementById("view-activity").innerHTML=`
-    <div style="font-family:'Playfair Display',serif;font-size:17px;color:#C8A46A;margin-bottom:14px;font-weight:700">Activity Log</div>
-    <div style="position:relative">
-      <div class="act-line"></div>
-      ${all.map(a=>`
-        <div style="display:flex;gap:12px;margin-bottom:11px;position:relative" onclick="openDetail(${a.cid})">
-          <div class="act-dot">📝</div>
-          <div style="flex:1;background:rgba(255,255,255,.025);border:1px solid rgba(200,164,106,.12);border-radius:8px;padding:9px 12px;cursor:pointer">
-            <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-              <span style="font-weight:700;font-size:13px;color:#F4EBCF">${a.cname}</span>
-              <span style="font-family:'Courier Prime',monospace;font-size:9px;color:#8A9A78">${a.date}</span>
-            </div>
-            <div style="font-size:13px;color:#F4EBCF;margin-bottom:5px">${a.text}</div>
-            <div style="display:flex;gap:6px">
-              <span class="ranch-pill ${ranchCls(a.ranch)}">${ranchShort(a.ranch)}</span>
-              ${statusH(a.status)}
-            </div>
-          </div>
-        </div>`).join("")}
-    </div>`;
+  const all=clients.flatMap(c=>(c.activity||[]).map(a=>({...a,cid:c.id,cname:c.name,ranch:c.ranch,status:c.status}))).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,100);
+  document.getElementById('view-activity').innerHTML=`
+    <div style="font-size:16px;font-weight:700;margin-bottom:12px">Activity Log</div>
+    ${all.map(a=>`<div onclick="openDetail(${a.cid})" style="display:flex;gap:10px;margin-bottom:8px;cursor:pointer">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">📝</div>
+      <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 11px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <span style="font-weight:600;font-size:13px">${a.cname}</span>
+          <span style="font-size:10px;color:var(--text3)">${a.date}</span>
+        </div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${a.text}</div>
+        <div style="display:flex;gap:5px"><span class="chip ${rCls(a.ranch)}" style="font-size:9px">${rShort(a.ranch)}</span>${schip(a.status)}</div>
+      </div>
+    </div>`).join('')}`;
 }
 
-// ── DETAIL ─────────────────────────────────────────────────────────────────
 function openDetail(id){
-  detailId=id;
-  const c=clients.find(x=>x.id===id);
-  if(!c)return;
-  document.getElementById("dp-name").textContent=c.name;
-  document.getElementById("dp-meta").innerHTML=`<span class="ranch-pill ${ranchCls(c.ranch)}">${ranchShort(c.ranch)}</span>${statusH(c.status)}`;
-  const depPct=c.revenue?Math.min(100,Math.round(c.deposit/c.revenue*100)):0;
-  document.getElementById("dp-body").innerHTML=`
-    <!-- Status quick update -->
-    <div class="detail-section">
-      <div class="section-title">Update Status</div>
-      <div class="status-quick">${STATUSES.map(s=>`<button class="sqbtn" onclick="updateStatus(${c.id},'${s.val}')" style="background:${c.status===s.val?s.bg:"transparent"};color:${s.color};border-color:${s.border}">${s.icon} ${s.label.split(" ")[0]}</button>`).join("")}</div>
+  const c=clients.find(x=>x.id===id);if(!c)return;
+  document.getElementById('dp-name').textContent=c.name;
+  document.getElementById('dp-meta').innerHTML=`<span class="chip ${rCls(c.ranch)}">${rShort(c.ranch)}</span>${schip(c.status)}`;
+  const depPct=c.revenue?Math.min(100,Math.round((c.deposit||0)/c.revenue*100)):0;
+  document.getElementById('dp-body').innerHTML=`
+    <div style="margin-bottom:18px">
+      <div class="sec-label">Update Status</div>
+      <div class="sqw">${STATUSES.map(s=>`<button class="sq ${s.cls}" onclick="updateStatus(${c.id},'${s.val}')" style="opacity:${c.status===s.val?'1':'.4'}">${s.icon} ${s.label.split(' ')[0]}</button>`).join('')}</div>
     </div>
-    <!-- Contact -->
-    <div class="detail-section">
-      <div class="section-title">Contact</div>
-      ${[["Phone",c.phone||"—"],["Email",c.email||"—"],["State",c.state||"—"],["Referral",c.referral||"—"]].map(([k,v])=>`<div class="detail-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}
+    <div style="margin-bottom:18px">
+      <div class="sec-label">Contact</div>
+      ${[['Phone',c.phone||'—'],['Email',c.email||'—'],['State',c.state||'—'],['Referral',c.referral||'—']].map(([k,v])=>`<div class="dr"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')}
     </div>
-    <!-- Hunt -->
-    <div class="detail-section">
-      <div class="section-title">Hunt Details</div>
-      ${[["Season",c.season||"—"],["Party",(c.party||1)+" hunter"+(c.party>1?"s":"")],["Waitlist #",c.position?"#"+c.position:"—"],["Follow-Up",c.followUpDate?`<span style="color:${fuColor(c.followUpDate)}">${fuIcon(c.followUpDate)}${c.followUpDate}</span>`:"Not set"]].map(([k,v])=>`<div class="detail-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}
-      ${c.huntClass?`<div style="margin-top:7px">${chipH(c.huntClass)}</div>`:""}
+    <div style="margin-bottom:18px">
+      <div class="sec-label">Hunt Details</div>
+      ${[['Season',c.season||'—'],['Party Size',(c.party||1)+' hunter'+((c.party||1)>1?'s':'')],['Waitlist #',c.position?'#'+c.position:'—'],['Follow-Up Date',c.followUpDate?`<span style="color:${fuClr(c.followUpDate)}">${fuIcon(c.followUpDate)}${c.followUpDate}</span>`:'Not set']].map(([k,v])=>`<div class="dr"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')}
+      ${c.huntClass?`<div style="margin-top:8px">${cchip(c.huntClass)}</div>`:''}
     </div>
-    <!-- Financials -->
-    <div class="detail-section">
-      <div class="section-title">Financials</div>
-      ${[["Deal Value",fmt$(c.revenue),"#D4A030"],["50% Deposit",fmt$(c.revenue?c.revenue*.5:0),"#F4EBCF"],["Collected",fmt$(c.deposit),"#80C880"],["Balance",fmt$(Math.max(0,c.revenue-c.deposit)),c.revenue-c.deposit>0?"#E8906A":"#80C880"]].map(([k,v,col])=>`<div class="detail-row"><span class="k">${k}</span><span class="v" style="color:${col};font-family:'Courier Prime',monospace">${v}</span></div>`).join("")}
-      <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-        <span style="font-family:'Courier Prime',monospace;font-size:9px;color:#8A9A78">${depPct}%</span>
-        <div class="dep-bar" style="flex:1"><div class="dep-fill" style="width:${depPct}%"></div></div>
-      </div>
+    <div style="margin-bottom:18px">
+      <div class="sec-label">Financials</div>
+      ${[['Deal Value',fmt$(c.revenue),'var(--gold)'],['50% Target',fmt$(c.revenue?c.revenue*.5:0),'var(--text2)'],['Collected',fmt$(c.deposit||0),'#60c060'],['Balance Due',fmt$(Math.max(0,(c.revenue||0)-(c.deposit||0))),((c.revenue||0)-(c.deposit||0))>0?'#e07850':'#60c060']].map(([k,v,col])=>`<div class="dr"><span class="k">${k}</span><span class="v" style="color:${col}">${v}</span></div>`).join('')}
+      <div style="margin-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">${depPct}% collected</div><div class="dbar"><div class="dfill" style="width:${depPct}%"></div></div></div>
     </div>
-    <!-- Notes -->
-    <div class="detail-section">
-      <div class="section-title">Notes</div>
-      <div class="notes-box">${c.notes||"No notes yet."}</div>
+    <div style="margin-bottom:18px">
+      <div class="sec-label">Notes</div>
+      <div class="nbox">${c.notes||'No notes yet.'}</div>
     </div>
-    <!-- Activity -->
-    <div class="detail-section">
-      <div class="section-title">Activity Log</div>
-      <div style="max-height:160px;overflow-y:auto;margin-bottom:10px">${[...(c.activity||[])].reverse().map(a=>`<div class="activity-item"><span class="activity-date">${a.date}</span><span style="color:#F4EBCF">${a.text}</span></div>`).join("")}</div>
+    <div style="margin-bottom:18px">
+      <div class="sec-label">Activity Log</div>
+      <div style="max-height:160px;overflow-y:auto;margin-bottom:10px">${[...(c.activity||[])].reverse().map(a=>`<div class="ai"><div class="ad">${a.date}</div><div style="color:var(--text2);line-height:1.4">${a.text}</div></div>`).join('')}</div>
       <div style="display:flex;gap:8px">
-        <input id="note-input" placeholder="Add note…" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(200,164,106,.22);border-radius:8px;color:#F4EBCF;padding:10px 12px;font-family:'Libre Baskerville',serif;font-size:14px;outline:none" onkeydown="if(event.key==='Enter')addNote(${c.id})">
-        <button onclick="addNote(${c.id})" style="background:#C8A46A;color:#1E1509;border:none;border-radius:8px;padding:10px 14px;font-family:'Playfair Display',serif;font-weight:700;font-size:13px;cursor:pointer">Add</button>
+        <input id="note-input" placeholder="Add note or call log…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px;font-size:14px;outline:none" onkeydown="if(event.key==='Enter')addNote(${c.id})">
+        <button onclick="addNote(${c.id})" style="background:var(--accent);color:#1a1a0a;border:none;border-radius:8px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer">Add</button>
       </div>
     </div>
-    <!-- Actions -->
-    <div style="display:flex;gap:9px;margin-top:6px">
-      <button class="btn-primary" onclick="openEdit(${c.id})">✏️ Edit</button>
-      <button class="btn-danger" onclick="deleteClient(${c.id})">🗑</button>
-    </div>
-  `;
-  openSheet("detailSheet");
+    <div style="display:flex;gap:8px">
+      <button class="bp" onclick="openEdit(${c.id})">✏️ Edit Client</button>
+      <button class="bdel" onclick="deleteClient(${c.id})">🗑</button>
+    </div>`;
+  openSheet('detailSheet');
 }
 
 function addNote(id){
-  const inp=document.getElementById("note-input");
-  const txt=(inp?.value||"").trim();
-  if(!txt)return;
-  const idx=clients.findIndex(c=>c.id===id);
-  if(idx<0)return;
+  const inp=document.getElementById('note-input');
+  const txt=(inp?.value||'').trim();if(!txt)return;
+  const idx=clients.findIndex(c=>c.id===id);if(idx<0)return;
   clients[idx].activity=[...(clients[idx].activity||[]),{date:todayStr(),text:txt}];
-  saveClient_db(clients[idx]);
-  inp.value="";
-  openDetail(id); // re-render
-  toast("📝 Note added");
+  save_db(clients[idx]);inp.value='';openDetail(id);toast('📝 Note added');
 }
-
 function updateStatus(id,status){
-  const idx=clients.findIndex(c=>c.id===id);
-  if(idx<0)return;
+  const idx=clients.findIndex(c=>c.id===id);if(idx<0)return;
   clients[idx].status=status;
-  clients[idx].activity=[...(clients[idx].activity||[]),{date:todayStr(),text:"Status → "+(SM[status]?.label||status)}];
-  saveClient_db(clients[idx]);
-  openDetail(id);
-  render();
-  toast("✅ Status updated");
+  clients[idx].activity=[...(clients[idx].activity||[]),{date:todayStr(),text:'Status → '+(SM[status]?.label||status)}];
+  save_db(clients[idx]);openDetail(id);render();toast('✅ Updated');
 }
 
-// ── MODAL ──────────────────────────────────────────────────────────────────
-function openAdd(){editId=null;document.getElementById("sheet-title").textContent="New Client";clearForm();populateStatusSelect();updateClassGrid();openSheet("addSheet");}
+function openAdd(){editId=null;document.getElementById('sheet-title').textContent='New Client';clearForm();populateStatusSelect();updateClassGrid();openSheet('addSheet');}
 function openEdit(id){
-  const c=clients.find(x=>x.id===id);
-  if(!c)return;
+  const c=clients.find(x=>x.id===id);if(!c)return;
   editId=id;
-  document.getElementById("sheet-title").textContent="Edit Client";
-  document.getElementById("f-name").value=c.name||"";
-  document.getElementById("f-phone").value=c.phone||"";
-  document.getElementById("f-email").value=c.email||"";
-  document.getElementById("f-state").value=c.state||"";
-  document.getElementById("f-ranch").value=c.ranch||"Cotton Mesa";
-  document.getElementById("f-revenue").value=c.revenue||"";
-  document.getElementById("f-deposit").value=c.deposit||"";
-  document.getElementById("f-season").value=c.season||"";
-  document.getElementById("f-party").value=c.party||1;
-  document.getElementById("f-position").value=c.position||"";
-  document.getElementById("f-followup").value=c.followUpDate||"";
-  document.getElementById("f-referral").value=c.referral||"";
-  document.getElementById("f-notes").value=c.notes||"";
-  populateStatusSelect(c.status);
-  updateClassGrid(c.huntClass);
-  closeSheet("detailSheet");
-  openSheet("addSheet");
+  document.getElementById('sheet-title').textContent='Edit Client';
+  document.getElementById('f-name').value=c.name||'';
+  document.getElementById('f-phone').value=c.phone||'';
+  document.getElementById('f-email').value=c.email||'';
+  document.getElementById('f-state').value=c.state||'';
+  document.getElementById('f-ranch').value=c.ranch||'Cotton Mesa';
+  document.getElementById('f-revenue').value=c.revenue||'';
+  document.getElementById('f-deposit').value=c.deposit||'';
+  document.getElementById('f-season').value=c.season||'';
+  document.getElementById('f-party').value=c.party||1;
+  document.getElementById('f-position').value=c.position||'';
+  document.getElementById('f-followup').value=c.followUpDate||'';
+  document.getElementById('f-referral').value=c.referral||'';
+  document.getElementById('f-notes').value=c.notes||'';
+  populateStatusSelect(c.status);updateClassGrid(c.huntClass);
+  closeSheet('detailSheet');openSheet('addSheet');
 }
-
-function populateStatusSelect(selected="inquiry"){
-  const sel=document.getElementById("f-status");
-  sel.innerHTML=STATUSES.map(s=>`<option value="${s.val}"${s.val===selected?" selected":""}>${s.icon} ${s.label}</option>`).join("");
+function populateStatusSelect(sel='inquiry'){
+  document.getElementById('f-status').innerHTML=STATUSES.map(s=>`<option value="${s.val}"${s.val===sel?' selected':''}>${s.icon} ${s.label}</option>`).join('');
 }
-
 function clearForm(){
-  ["f-name","f-phone","f-email","f-state","f-revenue","f-deposit","f-season","f-referral","f-notes","f-followup"].forEach(id=>{document.getElementById(id).value="";});
-  document.getElementById("f-party").value="1";
-  document.getElementById("f-ranch").value="Cotton Mesa";
+  ['f-name','f-phone','f-email','f-state','f-revenue','f-deposit','f-season','f-referral','f-notes','f-followup'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('f-party').value='1';
+  document.getElementById('f-position').value='';
+  document.getElementById('f-ranch').value='Cotton Mesa';
 }
-
-function updateClassGrid(selected=""){
-  const ranch=document.getElementById("f-ranch").value;
+function updateClassGrid(selected=''){
+  const ranch=document.getElementById('f-ranch').value;
   const classes=CLASS_SETS[ranch]||CMR;
-  document.getElementById("classGrid").innerHTML=classes.map(cls=>`
-    <button type="button" class="class-btn${cls.val===selected?" sel":""}" onclick="selectClass(this,'${cls.val.replace(/'/g,"\\'")}')">
-      ${cls.label}
-      <span class="class-btn-sub">${fmt$(cls.price)} · ${cls.score}</span>
-    </button>`).join("");
-  document.getElementById("classGrid").dataset.selected=selected;
+  document.getElementById('classGrid').innerHTML=classes.map(cls=>`<button type="button" class="cbtn${cls.val===selected?' sel':''}" onclick="selectClass(this,'${cls.val.replace(/'/g,"\\'")}')">
+    ${cls.label}<span class="cbtn-sub">${fmt$(cls.price)} · ${cls.score}</span></button>`).join('');
+  document.getElementById('classGrid').dataset.selected=selected;
 }
-
 function selectClass(btn,val){
-  document.querySelectorAll(".class-btn").forEach(b=>b.classList.remove("sel"));
-  btn.classList.add("sel");
-  document.getElementById("classGrid").dataset.selected=val;
+  document.querySelectorAll('.cbtn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  document.getElementById('classGrid').dataset.selected=val;
 }
-
 function saveClient(){
-  const name=document.getElementById("f-name").value.trim();
-  if(!name){toast("⚠️ Name is required");return;}
-  const huntClass=document.getElementById("classGrid").dataset.selected||"";
-  const data={name,phone:document.getElementById("f-phone").value.trim(),email:document.getElementById("f-email").value.trim(),state:document.getElementById("f-state").value.trim(),ranch:document.getElementById("f-ranch").value,status:document.getElementById("f-status").value,position:parseInt(document.getElementById("f-position").value)||null,huntClass,revenue:parseFloat(document.getElementById("f-revenue").value)||0,deposit:parseFloat(document.getElementById("f-deposit").value)||0,season:document.getElementById("f-season").value.trim(),party:parseInt(document.getElementById("f-party").value)||1,referral:document.getElementById("f-referral").value.trim(),notes:document.getElementById("f-notes").value.trim(),followUpDate:document.getElementById("f-followup").value||""};
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){toast('⚠️ Name required');return;}
+  const huntClass=document.getElementById('classGrid').dataset.selected||'';
+  const data={name,phone:document.getElementById('f-phone').value.trim(),email:document.getElementById('f-email').value.trim(),state:document.getElementById('f-state').value.trim(),ranch:document.getElementById('f-ranch').value,status:document.getElementById('f-status').value,position:parseInt(document.getElementById('f-position').value)||null,huntClass,revenue:parseFloat(document.getElementById('f-revenue').value)||0,deposit:parseFloat(document.getElementById('f-deposit').value)||0,season:document.getElementById('f-season').value.trim(),party:parseInt(document.getElementById('f-party').value)||1,referral:document.getElementById('f-referral').value.trim(),notes:document.getElementById('f-notes').value.trim(),followUpDate:document.getElementById('f-followup').value||''};
   if(editId){
     const idx=clients.findIndex(c=>c.id===editId);
     clients[idx]={...clients[idx],...data};
-    saveClient_db(clients[idx]);
-    toast("✅ Updated");
+    save_db(clients[idx]);toast('✅ Updated');
   }else{
-    const nc={id:nextId++,...data,addedDate:todayStr(),activity:[{date:todayStr(),text:"Added — "+(SM[data.status]?.label||data.status)}]};clients.push(nc);insertClient_db(nc);
-    toast("✅ Client added");
+    const nc={id:nextId++,...data,addedDate:todayStr(),activity:[{date:todayStr(),text:'Added — '+(SM[data.status]?.label||data.status)}]};
+    clients.push(nc);insert_db(nc);toast('✅ Client added');
   }
-  closeSheet("addSheet");
-  render();
+  closeSheet('addSheet');render();
 }
-
 function deleteClient(id){
-  if(!confirm("Remove this client?"))return;
+  if(!confirm('Remove this client? This cannot be undone.'))return;
   clients=clients.filter(c=>c.id!==id);
-  deleteClient_db(id);
-  closeSheet("detailSheet");
-  render();
-  toast("🗑 Removed");
+  delete_db(id);closeSheet('detailSheet');render();toast('🗑 Removed');
 }
 
-// ── SHEETS ─────────────────────────────────────────────────────────────────
-function openSheet(id){document.getElementById(id).classList.add("open");}
-function closeSheet(id){document.getElementById(id).classList.remove("open");}
-// Tap backdrop to close
-document.querySelectorAll(".sheet-overlay").forEach(el=>{
-  el.addEventListener("click",function(e){if(e.target===this)this.classList.remove("open");});
-});
+// EMAIL IMPORT
+async function parseEmail(){
+  const text=document.getElementById('import-text').value.trim();
+  if(!text){toast('⚠️ Paste an email first');return;}
+  const btn=document.getElementById('parse-btn');
+  btn.textContent='Parsing…';btn.disabled=true;
+  document.getElementById('import-status').innerHTML='<div style="padding:14px;text-align:center;color:var(--text3);font-size:13px">🤖 Reading email with AI…</div>';
+  document.getElementById('import-preview').style.display='none';
+  document.getElementById('save-import-btn').style.display='none';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:800,
+        system:`Extract client info from hunting ranch inquiry emails. Return ONLY valid JSON with these fields:
+name (string, required), phone (string, formatted (555) 123-4567 or ""), email (string or ""),
+huntClass (one of: "Cow Hunt","Management Bull","Bronze Medal","Silver Medal","Gold Medal","Platinum","Lifetime","Lifetime Plus","B&C Club","Silver Class","Gold Class","Platinum Class","Platinum Plus","Lifetime Class","B&C Club (WT)","Bronze (AS)","Silver (AS)","Gold (AS)","Platinum (AS)", or ""),
+party (number, default 1), season (string like "Fall 2026" or ""), referral (string or ""),
+notes (string, any other relevant context or ""), ranch (one of "Cotton Mesa","Sombrerito","Apache Springs", default "Cotton Mesa").
+Return ONLY the JSON object.`,
+        messages:[{role:'user',content:'Extract client info:\n\n'+text}]
+      })
+    });
+    const data=await res.json();
+    const raw=data.content[0].text.replace(/```json|```/g,'').trim();
+    parsedImport=JSON.parse(raw);
+    const fields=[['Name',parsedImport.name||'—'],['Phone',parsedImport.phone||'—'],['Email',parsedImport.email||'—'],['Hunt Class',parsedImport.huntClass||'—'],['Party',parsedImport.party||1],['Season',parsedImport.season||'—'],['Ranch',parsedImport.ranch||'Cotton Mesa'],['Referral',parsedImport.referral||'—'],['Notes',parsedImport.notes||'—']];
+    document.getElementById('import-status').innerHTML='<div style="padding:8px 0;font-size:12px;color:#60c060">✅ Parsed successfully</div>';
+    document.getElementById('import-fields').innerHTML=fields.map(([k,v])=>`<div class="ifield"><span class="ik">${k}</span><span class="iv">${v}</span></div>`).join('');
+    document.getElementById('import-preview').style.display='block';
+    document.getElementById('save-import-btn').style.display='block';
+    btn.textContent='Re-parse';
+  }catch(e){
+    console.error(e);
+    document.getElementById('import-status').innerHTML='<div style="padding:10px;color:#e07850;font-size:13px">⚠️ Could not parse — try again or add manually</div>';
+    btn.textContent='Parse with AI';
+  }finally{
+    btn.disabled=false;
+  }
+}
+function saveImportedClient(){
+  if(!parsedImport||!parsedImport.name){toast('⚠️ Nothing to save');return;}
+  const allCls=[...CMR,...SOM,...APACHE];
+  const hc=allCls.find(c=>c.val===parsedImport.huntClass);
+  const price=hc?hc.price:0;
+  const party=parsedImport.party||1;
+  const nc={id:nextId++,name:parsedImport.name,phone:parsedImport.phone||'',email:parsedImport.email||'',state:'',ranch:parsedImport.ranch||'Cotton Mesa',status:'inquiry',position:null,huntClass:parsedImport.huntClass||'',revenue:price*party,deposit:0,season:parsedImport.season||'Fall 2026',party,referral:parsedImport.referral||'Email',notes:parsedImport.notes||'',followUpDate:'',addedDate:todayStr(),activity:[{date:todayStr(),text:'Added via email import'}]};
+  clients.push(nc);insert_db(nc);
+  parsedImport=null;
+  document.getElementById('import-text').value='';
+  document.getElementById('import-status').innerHTML='';
+  document.getElementById('import-preview').style.display='none';
+  document.getElementById('save-import-btn').style.display='none';
+  document.getElementById('parse-btn').textContent='Parse with AI';
+  closeSheet('importSheet');render();
+  toast('✅ '+nc.name+' added as Inquiry');
+}
 
-// ── INSTALL ────────────────────────────────────────────────────────────────
-function showInstallInstructions(){closeSheet("installSheet");openSheet("installSheet");}
-function dismissInstall(){document.getElementById("install-banner").classList.remove("show");localStorage.setItem("install-dismissed","1");}
+function openSheet(id){document.getElementById(id).classList.add('open');}
+function closeSheet(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(el=>{el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});});
+
+function dismissInstall(){document.getElementById('install-banner').classList.remove('show');localStorage.setItem('install-dismissed','1');}
 function checkInstallBanner(){
-  const isInstalled=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone;
-  const dismissed=localStorage.getItem("install-dismissed");
-  if(!isInstalled&&!dismissed){setTimeout(()=>{document.getElementById("install-banner").classList.add("show");},2500);}
+  const inst=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
+  if(!inst&&!localStorage.getItem('install-dismissed'))setTimeout(()=>document.getElementById('install-banner').classList.add('show'),3000);
 }
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
 
-// ── SERVICE WORKER ─────────────────────────────────────────────────────────
-if("serviceWorker" in navigator){
-  window.addEventListener("load",()=>{navigator.serviceWorker.register("/sw.js").catch(e=>console.warn("SW:",e));});
-}
-
-// ── BOOT ───────────────────────────────────────────────────────────────────
 async function boot(){
   await loadData();
-  document.getElementById("loading").style.display="none";
-  document.getElementById("app").style.display="flex";
-  populateStatusSelect();
-  updateClassGrid();
-  render();
-  checkInstallBanner();
+  document.getElementById('loading').style.display='none';
+  document.getElementById('app').style.display='flex';
+  populateStatusSelect();updateClassGrid();render();checkInstallBanner();
 }
 boot();
 </script>
