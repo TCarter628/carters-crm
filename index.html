@@ -475,177 +475,413 @@ const SEED = [
   {id:65,name:'Mason Weathermon',phone:'',email:'mweatherson@me.com',state:'',ranch:'Cotton Mesa',status:'inquiry',position:65,huntClass:'Management Bull',revenue:19900,deposit:0,season:'Fall 2026',party:2,referral:'',notes:'',followUpDate:'',addedDate:'2026-01-28',activity:[{date:'2026-01-28',text:'Imported from Outlook tasks — Management Bull'}]}
 ];
 
-const SK="carters_crm_v6";
+const SK="carters_crm_v5";
 let clients=[],nextId=9,currentView="dashboard",statusFilter="all",huntFilter=null,searchQ="",editId=null,detailId=null;
 
 const todayStr=()=>new Date().toISOString().split("T")[0];
 const fmt$=n=>n?"$"+Number(n).toLocaleString():"—";
 
-// ── SUPABASE CONFIG ──────────────────────────────────────────────────────
-const SB_URL = "https://wlmfomuyrzpqmxwpdnyy.supabase.co";
-const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsbWZvbXV5cnpwcW14d3Bkbnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc5NDUsImV4cCI6MjA4NzM0Mzk0NX0.tmyXMbb3a_Jtb-tb_S2G4olJvwz3ADtcA_8SfJRiqSE";
+// ── SUPABASE ──────────────────────────────────────────────────────────────
+const SB_URL='https://wlmfomuyrzpqmxwpdnyy.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsbWZvbXV5cnpwcW14d3Bkbnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc5NDUsImV4cCI6MjA4NzM0Mzk0NX0.tmyXMbb3a_Jtb-tb_S2G4olJvwz3ADtcA_8SfJRiqSE';
 
-async function sbFetch(path, opts={}) {
-  const res = await fetch(SB_URL + path, {
-    ...opts,
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': opts.prefer || '',
-      ...(opts.headers||{})
-    }
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err);
-  }
-  return res.status === 204 ? null : res.json();
+async function sbFetch(path,opts){
+  opts=opts||{};
+  const res=await fetch(SB_URL+path,{method:opts.method||'GET',body:opts.body||null,headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':opts.prefer||''}});
+  if(!res.ok){const e=await res.text();throw new Error(e);}
+  return res.status===204?null:res.json();
+}
+function clientToDb(c){return{id:c.id,name:c.name,phone:c.phone||'',email:c.email||'',state:c.state||'',ranch:c.ranch||'Cotton Mesa',status:c.status||'inquiry',position:c.position||null,hunt_class:c.huntClass||'',revenue:c.revenue||0,deposit:c.deposit||0,season:c.season||'',party:c.party||1,referral:c.referral||'',notes:c.notes||'',follow_up_date:c.followUpDate||null,added_date:c.addedDate||new Date().toISOString().split('T')[0],activity:c.activity||[]};}
+function dbToClient(r){return{id:r.id,name:r.name,phone:r.phone||'',email:r.email||'',state:r.state||'',ranch:r.ranch||'Cotton Mesa',status:r.status||'inquiry',position:r.position,huntClass:r.hunt_class||'',revenue:r.revenue||0,deposit:r.deposit||0,season:r.season||'',party:r.party||1,referral:r.referral||'',notes:r.notes||'',followUpDate:r.follow_up_date||'',addedDate:r.added_date||'',activity:r.activity||[]};}
+
+async function loadData(){
+  try{
+    const rows=await sbFetch('/rest/v1/clients?select=*&order=position.asc.nullslast');
+    if(rows&&rows.length>0){clients=rows.map(dbToClient);nextId=Math.max(...clients.map(c=>c.id))+1;}
+    else{clients=SEED;nextId=SEED.length+1;toast('No data found in database');}
+  }catch(e){console.error('Load error:',e);clients=SEED;nextId=SEED.length+1;toast('Offline mode');}
+}
+async function saveClient_db(c){setSyncStatus('saving');try{await sbFetch('/rest/v1/clients?id=eq.'+c.id,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify(clientToDb(c))});setSyncStatus('saved');setTimeout(()=>setSyncStatus('idle'),2000);}catch(e){console.error('Save:',e);setSyncStatus('error');setTimeout(()=>setSyncStatus('idle'),3000);}}
+async function insertClient_db(c){setSyncStatus('saving');try{await sbFetch('/rest/v1/clients',{method:'POST',prefer:'return=minimal',body:JSON.stringify(clientToDb(c))});setSyncStatus('saved');setTimeout(()=>setSyncStatus('idle'),2000);}catch(e){console.error('Insert:',e);setSyncStatus('error');}}
+async function deleteClient_db(id){setSyncStatus('saving');try{await sbFetch('/rest/v1/clients?id=eq.'+id,{method:'DELETE'});setSyncStatus('saved');setTimeout(()=>setSyncStatus('idle'),2000);}catch(e){console.error('Delete:',e);setSyncStatus('error');}}
+
+let saveTimer=null;
+async function saveData(){
+  setSyncStatus("saving");
+  const payload=JSON.stringify({clients,nextId});
+  try{
+    if(window.storage)await window.storage.set(SK,payload);
+    localStorage.setItem(SK,payload); // also keep local copy
+    setSyncStatus("saved");setTimeout(()=>setSyncStatus("idle"),2000);
+  }catch(e){setSyncStatus("error");setTimeout(()=>setSyncStatus("idle"),3000);}
+}
+function debouncedSave(){
+  if(saveTimer)clearTimeout(saveTimer);
+  saveTimer=setTimeout(saveData,800);
 }
 
-// ── DATA LOAD ──────────────────────────────────────────────────────────────
-async function loadData() {
-  try {
-    const rows = await sbFetch('/rest/v1/clients?select=*&order=position.asc.nullslast');
-    if (rows && rows.length > 0) {
-      clients = rows.map(dbToClient);
-      nextId = Math.max(...clients.map(c => c.id)) + 1;
-    } else {
-      // First run — seed the database
-      await seedDatabase();
-    }
-  } catch(e) {
-    console.error('Load error:', e);
-    // Fallback to local seed
-    clients = SEED;
-    nextId = SEED.length + 1;
-    toast('⚠️ Offline mode — changes won\'t sync');
-  }
+function setSyncStatus(s){
+  const d=document.getElementById("sync-dot");
+  d.className="sync-dot "+s;
 }
 
-async function seedDatabase() {
-  setSyncStatus('saving');
-  try {
-    const rows = SEED.map(clientToDb);
-    await sbFetch('/rest/v1/clients', {
-      method: 'POST',
-      prefer: 'return=minimal',
-      body: JSON.stringify(rows)
-    });
-    clients = [...SEED];
-    nextId = SEED.length + 1;
-    setSyncStatus('saved');
-    setTimeout(() => setSyncStatus('idle'), 2000);
-  } catch(e) {
-    console.error('Seed error:', e);
-    clients = SEED;
-    nextId = SEED.length + 1;
-    setSyncStatus('error');
-  }
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function chipStyleStr(val=""){
+  const v=val.toLowerCase();
+  if(v.includes("cow"))return"background:rgba(122,140,106,.15);color:#9AB48A;border:1px solid rgba(122,140,106,.3)";
+  if(v.includes("mgmt")||v.includes("management"))return"background:rgba(90,60,30,.3);color:#C8906A;border:1px solid rgba(155,107,58,.3)";
+  if(v.includes("bronze"))return"background:rgba(139,90,50,.25);color:#D4A070;border:1px solid rgba(175,120,70,.4)";
+  if(v.includes("silver"))return"background:rgba(160,160,160,.15);color:#C8C8C8;border:1px solid rgba(160,160,160,.3)";
+  if(v.includes("gold"))return"background:rgba(212,160,48,.15);color:#D4A030;border:1px solid rgba(212,160,48,.4)";
+  if(v.includes("platinum plus"))return"background:rgba(140,170,200,.15);color:#90B8D8;border:1px solid rgba(140,170,200,.3)";
+  if(v.includes("platinum"))return"background:rgba(180,200,220,.12);color:#A8C8E8;border:1px solid rgba(180,200,220,.3)";
+  if(v.includes("lifetime plus"))return"background:rgba(180,50,20,.2);color:#F08060;border:1px solid rgba(180,50,20,.35)";
+  if(v.includes("lifetime"))return"background:rgba(212,74,30,.15);color:#E8906A;border:1px solid rgba(212,74,30,.3)";
+  if(v.includes("b&c")||v.includes("bc club"))return"background:rgba(212,74,30,.25);color:#FF9060;border:1px solid rgba(212,74,30,.5)";
+  return"background:rgba(110,128,87,.15);color:#8A9A78;border:1px solid rgba(110,128,87,.3)";
+}
+function chipH(val){if(!val)return'<span style="color:#8A9A78;font-size:10px">—</span>';return`<span class="class-chip" style="${chipStyleStr(val)}">${val}</span>`;}
+function ranchCls(r){return r==="Sombrerito"?"ranch-som":r==="Apache Springs"?"ranch-apache":"ranch-cmr";}
+function ranchShort(r){return r==="Apache Springs"?"Apache Spgs":r;}
+function statusH(s){const st=SM[s]||SM.cold;return`<span class="status-chip" style="background:${st.bg};color:${st.color};border:1px solid ${st.border}">${st.icon} ${st.label}</span>`;}
+function fuColor(d){if(!d)return"#8A9A78";const t=todayStr();return d<t?"#E8855A":d===t?"#D4A030":"#8A9A78";}
+function fuIcon(d){if(!d)return"";const t=todayStr();return d<t?"🚨 ":d===t?"📅 ":"⏰ ";}
+
+function toast(msg){const e=document.getElementById("toast");e.textContent=msg;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2600);}
+
+// ── VIEW ──────────────────────────────────────────────────────────────────
+function setView(v){
+  currentView=v;
+  document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
+  document.getElementById("view-"+v).classList.add("active");
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("nav-"+v).classList.add("active");
+  // Hide FAB on pipeline/activity
+  document.getElementById("fab").style.display=["pipeline","activity"].includes(v)?"none":"flex";
+  render();
 }
 
-// ── DB TRANSFORMS ──────────────────────────────────────────────────────────
-function clientToDb(c) {
-  return {
-    id: c.id,
-    name: c.name,
-    phone: c.phone || '',
-    email: c.email || '',
-    state: c.state || '',
-    ranch: c.ranch || 'Cotton Mesa',
-    status: c.status || 'inquiry',
-    position: c.position || null,
-    hunt_class: c.huntClass || '',
-    revenue: c.revenue || 0,
-    deposit: c.deposit || 0,
-    season: c.season || '',
-    party: c.party || 1,
-    referral: c.referral || '',
-    notes: c.notes || '',
-    follow_up_date: c.followUpDate || null,
-    added_date: c.addedDate || new Date().toISOString().split('T')[0],
-    activity: c.activity || []
+function render(){
+  updateHeader();
+  if(currentView==="dashboard")renderDash();
+  else if(currentView==="clients")renderClients();
+  else if(currentView==="pipeline")renderPipeline();
+  else if(currentView==="followups")renderFollowups();
+  else if(currentView==="activity")renderActivity();
+}
+
+function updateHeader(){
+  const pipeline=clients.reduce((s,c)=>s+(c.revenue||0),0);
+  document.getElementById("hs-clients").textContent=clients.length;
+  document.getElementById("hs-pipeline").textContent="$"+Math.round(pipeline/1000)+"K";
+}
+
+// ── STATS ──────────────────────────────────────────────────────────────────
+function getStats(){
+  const pipeline=clients.reduce((s,c)=>s+(c.revenue||0),0);
+  const collected=clients.reduce((s,c)=>s+(c.deposit||0),0);
+  const byStatus={all:clients.length};
+  STATUSES.forEach(s=>{byStatus[s.val]=clients.filter(c=>c.status===s.val).length;});
+  const tod=todayStr();
+  const overdue=clients.filter(c=>c.followUpDate&&c.followUpDate<tod&&!["complete","cold"].includes(c.status));
+  const dueToday=clients.filter(c=>c.followUpDate===tod);
+  const dueSoon=clients.filter(c=>{if(!c.followUpDate)return false;const d=(new Date(c.followUpDate)-new Date())/86400000;return d>0&&d<=7;});
+  const noDue=clients.filter(c=>!c.followUpDate&&!["cold","complete"].includes(c.status));
+  return{pipeline,collected,balance:pipeline-collected,byStatus,overdue,dueToday,dueSoon,noDue};
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────────────────
+function renderDash(){
+  const s=getStats();
+  const kpis=[
+    {icon:"📈",val:fmt$(s.pipeline),label:"Pipeline",color:"#D4A030"},
+    {icon:"💵",val:fmt$(s.collected),label:"Collected",color:"#80C880"},
+    {icon:"⚖️",val:fmt$(s.balance),label:"Balance Due",color:"#E8906A"},
+    {icon:"🚨",val:s.overdue.length,label:"Overdue F/U",color:s.overdue.length>0?"#E8855A":"#6E8057"},
+    {icon:"⏳",val:s.byStatus.waitlist||0,label:"Waitlisted",color:"#D4A030"},
+    {icon:"💰",val:s.byStatus.deposit||0,label:"Deposits",color:"#90C0F0"},
+  ];
+  let fu="";
+  if(s.overdue.length===0&&s.dueToday.length===0&&s.dueSoon.length===0){
+    fu='<div style="text-align:center;padding:16px;color:#6E8057;font-style:italic;font-size:13px">All clear! 🎯</div>';
+  }else{
+    s.overdue.slice(0,2).forEach(c=>{fu+=`<div onclick="openDetail(${c.id})" style="cursor:pointer;padding:9px 10px;background:rgba(212,74,30,.07);border:1px solid rgba(212,74,30,.2);border-radius:7px;margin-bottom:7px"><div style="font-weight:700;font-size:13px;color:#F4EBCF">${c.name}</div><div style="font-family:'Courier Prime',monospace;font-size:9px;color:#E8855A">🚨 OVERDUE · ${c.followUpDate}</div></div>`;});
+    s.dueToday.slice(0,2).forEach(c=>{fu+=`<div onclick="openDetail(${c.id})" style="cursor:pointer;padding:9px 10px;background:rgba(212,160,48,.07);border:1px solid rgba(212,160,48,.2);border-radius:7px;margin-bottom:7px"><div style="font-weight:700;font-size:13px;color:#F4EBCF">${c.name}</div><div style="font-family:'Courier Prime',monospace;font-size:9px;color:#D4A030">📅 TODAY</div></div>`;});
+    s.dueSoon.slice(0,3).forEach(c=>{fu+=`<div onclick="openDetail(${c.id})" style="cursor:pointer;padding:8px 10px;border-radius:7px;margin-bottom:6px"><div style="font-size:13px;color:#F4EBCF">${c.name}</div><div style="font-family:'Courier Prime',monospace;font-size:9px;color:#8A9A78">⏰ ${c.followUpDate}</div></div>`;});
+  }
+  const topClasses={};clients.forEach(c=>{if(c.huntClass)topClasses[c.huntClass]=(topClasses[c.huntClass]||0)+1;});
+  const top=Object.entries(topClasses).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  document.getElementById("view-dashboard").innerHTML=`
+    <div class="kpi-grid">${kpis.map(k=>`<div class="card kpi-card"><div class="kpi-icon">${k.icon}</div><div class="kpi-val" style="color:${k.color}">${k.val}</div><div class="kpi-lbl">${k.label}</div></div>`).join("")}</div>
+    <div class="card" style="padding:13px 14px;margin-bottom:12px">
+      <div class="section-title">Pipeline by Status</div>
+      ${STATUSES.map(st=>{const n=s.byStatus[st.val]||0;const pct=clients.length?Math.round(n/clients.length*100):0;return`<div class="dash-bar-row" onclick="statusFilter='${st.val}';setView('clients')" style="cursor:pointer"><span style="font-size:11px">${st.icon}</span><span style="font-size:12px;color:#F4EBCF;flex:1">${st.label}</span><div class="dash-bar"><div class="dash-bar-fill" style="width:${pct}%;background:${st.color}"></div></div><span style="font-family:'Courier Prime',monospace;font-size:11px;color:${st.color};min-width:16px;text-align:right">${n}</span></div>`;}).join("")}
+    </div>
+    <div class="card" style="padding:13px 14px;margin-bottom:12px">
+      <div class="section-title">Follow-Ups Due</div>
+      ${fu}
+    </div>
+    ${top.length?`<div class="card" style="padding:13px 14px"><div class="section-title">Top Hunt Classes</div><div style="display:flex;flex-wrap:wrap;gap:8px">${top.map(([cls,n])=>`<div onclick="huntFilter='${cls}';setView('clients')" style="cursor:pointer;display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:1px solid rgba(200,164,106,.13);border-radius:8px;padding:8px 12px"><span class="class-chip" style="${chipStyleStr(cls)}">${cls}</span><span style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#D4A030">${n}</span></div>`).join("")}</div></div>`:""}
+  `;
+}
+
+// ── CLIENTS ────────────────────────────────────────────────────────────────
+function renderClients(){
+  let d=[...clients];
+  if(statusFilter!=="all")d=d.filter(c=>c.status===statusFilter);
+  if(huntFilter)d=d.filter(c=>c.huntClass===huntFilter);
+  if(searchQ){const q=searchQ.toLowerCase();d=d.filter(c=>c.name.toLowerCase().includes(q)||(c.notes||"").toLowerCase().includes(q)||(c.huntClass||"").toLowerCase().includes(q)||(c.ranch||"").toLowerCase().includes(q)||(c.state||"").toLowerCase().includes(q)||(c.phone||"").includes(q));}
+  d.sort((a,b)=>{let av=a.position??9999,bv=b.position??9999;return av-bv;});
+
+  const pills=[{f:"all",l:"All"},{f:"inquiry",l:"Inquiry"},{f:"hot",l:"🔥 Hot"},{f:"waitlist",l:"⏳ Wait"},{f:"deposit",l:"💰 Deposit"},{f:"booked",l:"✅ Booked"},{f:"vip",l:"⭐ VIP"},{f:"cold",l:"🧊 Cold"},{f:"complete",l:"🏆 Done"}];
+  const pillsH=pills.map(p=>`<button class="fpill${statusFilter===p.f?" active":""}" onclick="statusFilter='${p.f}';renderClients()">${p.l} <span style="opacity:.7">${p.f==="all"?clients.length:(clients.filter(c=>c.status===p.f).length)}</span></button>`).join("");
+
+  const cards=d.length===0?'<div class="empty"><div class="empty-icon">🎯</div><div class="empty-title">No clients match</div></div>':d.map(c=>`
+    <div class="client-card" onclick="openDetail(${c.id})">
+      <div class="client-card-top">
+        <div>
+          <div class="client-name">${c.name}</div>
+          <div class="client-sub">${c.phone||""}${c.state?" · "+c.state:""}</div>
+        </div>
+        ${statusH(c.status)}
+      </div>
+      <div class="client-card-mid">
+        <span class="ranch-pill ${ranchCls(c.ranch)}">${ranchShort(c.ranch)}</span>
+        ${c.huntClass?chipH(c.huntClass):""}
+      </div>
+      <div class="client-card-bot">
+        <span class="client-rev">${fmt$(c.revenue)}</span>
+        ${c.followUpDate?`<span class="client-fu" style="color:${fuColor(c.followUpDate)}">${fuIcon(c.followUpDate)}${c.followUpDate}</span>`:""}
+      </div>
+    </div>`).join("");
+
+  document.getElementById("view-clients").innerHTML=`
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input placeholder="Search clients…" value="${searchQ}" oninput="searchQ=this.value;renderClients()">
+      </div>
+    </div>
+    <div class="filter-pills">${pillsH}</div>
+    ${cards}`;
+}
+
+// ── PIPELINE ───────────────────────────────────────────────────────────────
+function renderPipeline(){
+  const cols=STATUSES.map(col=>{
+    const cc=clients.filter(c=>c.status===col.val);
+    const rev=cc.reduce((s,c)=>s+(c.revenue||0),0);
+    const cards=cc.length===0?`<div style="border:1px dashed rgba(200,164,106,.12);border-radius:7px;padding:16px 10px;text-align:center;color:#8A9A78;font-size:11px;font-style:italic">Empty</div>`:cc.map(c=>`
+      <div class="pipeline-card" onclick="openDetail(${c.id})">
+        <div style="font-weight:700;font-size:13px;color:#F4EBCF;margin-bottom:4px">${c.name}</div>
+        <span class="ranch-pill ${ranchCls(c.ranch)}">${ranchShort(c.ranch)}</span>
+        ${c.huntClass?`<div style="margin-top:4px">${chipH(c.huntClass)}</div>`:""}
+        ${c.revenue?`<div style="font-family:'Courier Prime',monospace;font-size:11px;color:#D4A030;font-weight:700;margin-top:4px">${fmt$(c.revenue)}</div>`:""}
+        ${c.followUpDate?`<div style="font-family:'Courier Prime',monospace;font-size:9px;color:${fuColor(c.followUpDate)};margin-top:3px">${fuIcon(c.followUpDate)}${c.followUpDate}</div>`:""}
+      </div>`).join("");
+    return`<div class="pipeline-col">
+      <div class="pipeline-col-head" style="border-color:${col.border}">
+        <span>${col.icon}</span>
+        <span class="pipeline-col-title" style="color:${col.color}">${col.label}</span>
+        <span class="pipeline-col-count" style="color:#8A9A78">${cc.length}</span>
+      </div>
+      ${rev>0?`<div style="font-family:'Courier Prime',monospace;font-size:9px;color:#D4A030;margin-bottom:5px;padding-left:2px">${fmt$(rev)}</div>`:""}
+      ${cards}
+    </div>`;
+  }).join("");
+  document.getElementById("view-pipeline").innerHTML=`<div class="pipeline-scroll"><div class="pipeline-board">${cols}</div></div>`;
+}
+
+// ── FOLLOW-UPS ──────────────────────────────────────────────────────────────
+function renderFollowups(){
+  const s=getStats();
+  const tod=todayStr();
+  const fuCard=(c,hl)=>{
+    const bdr=hl==="overdue"?"rgba(212,74,30,.4)":hl==="today"?"rgba(212,160,48,.4)":hl==="none"?"rgba(110,128,87,.2)":"rgba(200,164,106,.15)";
+    const bg=hl==="overdue"?"rgba(212,74,30,.05)":hl==="today"?"rgba(212,160,48,.05)":"rgba(255,255,255,.025)";
+    return`<div class="fu-card" onclick="openDetail(${c.id})" style="background:${bg};border:1px solid ${bdr}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">
+        <div style="font-weight:700;font-size:14px;color:#F4EBCF">${c.name}</div>
+        ${statusH(c.status)}
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:5px">
+        <span class="ranch-pill ${ranchCls(c.ranch)}">${ranchShort(c.ranch)}</span>
+        ${c.huntClass?chipH(c.huntClass):""}
+      </div>
+      <div style="font-family:'Courier Prime',monospace;font-size:10px;color:${c.followUpDate?fuColor(c.followUpDate):"#E8855A"}">${c.followUpDate?fuIcon(c.followUpDate)+"Follow-up: "+c.followUpDate:"⚠️ No follow-up scheduled"}</div>
+      ${c.phone?`<div style="font-family:'Courier Prime',monospace;font-size:10px;color:#6E8057;margin-top:3px">📞 ${c.phone}</div>`:""}
+    </div>`;
   };
+  let html="";
+  const sec=(title,color,items,hl)=>{if(!items.length)return"";return`<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:${color||"#F4EBCF"};margin-bottom:8px">${title}</div>${items.map(c=>fuCard(c,hl)).join("")}<div style="height:8px"></div>`;};
+  html+=sec(`🚨 Overdue (${s.overdue.length})`,"#E8855A",s.overdue,"overdue");
+  html+=sec(`📅 Due Today (${s.dueToday.length})`,"#D4A030",s.dueToday,"today");
+  html+=sec(`⏰ This Week (${s.dueSoon.length})`,"#F4EBCF",s.dueSoon,"soon");
+  const sched=clients.filter(c=>c.followUpDate&&c.followUpDate>=tod).sort((a,b)=>a.followUpDate.localeCompare(b.followUpDate));
+  html+=sec("📋 All Scheduled","#F4EBCF",sched,"");
+  html+=sec(`⚠️ No Follow-Up Set (${s.noDue.length})`,"#8A9A78",s.noDue,"none");
+  document.getElementById("view-followups").innerHTML=html||'<div class="empty"><div class="empty-icon">🎯</div><div class="empty-title">All clear!</div></div>';
 }
 
-function dbToClient(r) {
-  return {
-    id: r.id,
-    name: r.name,
-    phone: r.phone || '',
-    email: r.email || '',
-    state: r.state || '',
-    ranch: r.ranch || 'Cotton Mesa',
-    status: r.status || 'inquiry',
-    position: r.position,
-    huntClass: r.hunt_class || '',
-    revenue: r.revenue || 0,
-    deposit: r.deposit || 0,
-    season: r.season || '',
-    party: r.party || 1,
-    referral: r.referral || '',
-    notes: r.notes || '',
-    followUpDate: r.follow_up_date || '',
-    addedDate: r.added_date || '',
-    activity: r.activity || []
-  };
+// ── ACTIVITY ────────────────────────────────────────────────────────────────
+function renderActivity(){
+  const all=clients.flatMap(c=>(c.activity||[]).map(a=>({...a,cid:c.id,cname:c.name,ranch:c.ranch,status:c.status}))).sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById("view-activity").innerHTML=`
+    <div style="font-family:'Playfair Display',serif;font-size:17px;color:#C8A46A;margin-bottom:14px;font-weight:700">Activity Log</div>
+    <div style="position:relative">
+      <div class="act-line"></div>
+      ${all.map(a=>`
+        <div style="display:flex;gap:12px;margin-bottom:11px;position:relative" onclick="openDetail(${a.cid})">
+          <div class="act-dot">📝</div>
+          <div style="flex:1;background:rgba(255,255,255,.025);border:1px solid rgba(200,164,106,.12);border-radius:8px;padding:9px 12px;cursor:pointer">
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+              <span style="font-weight:700;font-size:13px;color:#F4EBCF">${a.cname}</span>
+              <span style="font-family:'Courier Prime',monospace;font-size:9px;color:#8A9A78">${a.date}</span>
+            </div>
+            <div style="font-size:13px;color:#F4EBCF;margin-bottom:5px">${a.text}</div>
+            <div style="display:flex;gap:6px">
+              <span class="ranch-pill ${ranchCls(a.ranch)}">${ranchShort(a.ranch)}</span>
+              ${statusH(a.status)}
+            </div>
+          </div>
+        </div>`).join("")}
+    </div>`;
 }
 
-// ── SAVE / UPDATE / DELETE ─────────────────────────────────────────────────
-let saveTimer = null;
-
-async function saveClient_db(c) {
-  setSyncStatus('saving');
-  try {
-    await sbFetch('/rest/v1/clients?id=eq.' + c.id, {
-      method: 'PATCH',
-      prefer: 'return=minimal',
-      body: JSON.stringify(clientToDb(c))
-    });
-    setSyncStatus('saved');
-    setTimeout(() => setSyncStatus('idle'), 2000);
-  } catch(e) {
-    console.error('Save error:', e);
-    setSyncStatus('error');
-    setTimeout(() => setSyncStatus('idle'), 3000);
-  }
+// ── DETAIL ─────────────────────────────────────────────────────────────────
+function openDetail(id){
+  detailId=id;
+  const c=clients.find(x=>x.id===id);
+  if(!c)return;
+  document.getElementById("dp-name").textContent=c.name;
+  document.getElementById("dp-meta").innerHTML=`<span class="ranch-pill ${ranchCls(c.ranch)}">${ranchShort(c.ranch)}</span>${statusH(c.status)}`;
+  const depPct=c.revenue?Math.min(100,Math.round(c.deposit/c.revenue*100)):0;
+  document.getElementById("dp-body").innerHTML=`
+    <!-- Status quick update -->
+    <div class="detail-section">
+      <div class="section-title">Update Status</div>
+      <div class="status-quick">${STATUSES.map(s=>`<button class="sqbtn" onclick="updateStatus(${c.id},'${s.val}')" style="background:${c.status===s.val?s.bg:"transparent"};color:${s.color};border-color:${s.border}">${s.icon} ${s.label.split(" ")[0]}</button>`).join("")}</div>
+    </div>
+    <!-- Contact -->
+    <div class="detail-section">
+      <div class="section-title">Contact</div>
+      ${[["Phone",c.phone||"—"],["Email",c.email||"—"],["State",c.state||"—"],["Referral",c.referral||"—"]].map(([k,v])=>`<div class="detail-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}
+    </div>
+    <!-- Hunt -->
+    <div class="detail-section">
+      <div class="section-title">Hunt Details</div>
+      ${[["Season",c.season||"—"],["Party",(c.party||1)+" hunter"+(c.party>1?"s":"")],["Waitlist #",c.position?"#"+c.position:"—"],["Follow-Up",c.followUpDate?`<span style="color:${fuColor(c.followUpDate)}">${fuIcon(c.followUpDate)}${c.followUpDate}</span>`:"Not set"]].map(([k,v])=>`<div class="detail-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}
+      ${c.huntClass?`<div style="margin-top:7px">${chipH(c.huntClass)}</div>`:""}
+    </div>
+    <!-- Financials -->
+    <div class="detail-section">
+      <div class="section-title">Financials</div>
+      ${[["Deal Value",fmt$(c.revenue),"#D4A030"],["50% Deposit",fmt$(c.revenue?c.revenue*.5:0),"#F4EBCF"],["Collected",fmt$(c.deposit),"#80C880"],["Balance",fmt$(Math.max(0,c.revenue-c.deposit)),c.revenue-c.deposit>0?"#E8906A":"#80C880"]].map(([k,v,col])=>`<div class="detail-row"><span class="k">${k}</span><span class="v" style="color:${col};font-family:'Courier Prime',monospace">${v}</span></div>`).join("")}
+      <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+        <span style="font-family:'Courier Prime',monospace;font-size:9px;color:#8A9A78">${depPct}%</span>
+        <div class="dep-bar" style="flex:1"><div class="dep-fill" style="width:${depPct}%"></div></div>
+      </div>
+    </div>
+    <!-- Notes -->
+    <div class="detail-section">
+      <div class="section-title">Notes</div>
+      <div class="notes-box">${c.notes||"No notes yet."}</div>
+    </div>
+    <!-- Activity -->
+    <div class="detail-section">
+      <div class="section-title">Activity Log</div>
+      <div style="max-height:160px;overflow-y:auto;margin-bottom:10px">${[...(c.activity||[])].reverse().map(a=>`<div class="activity-item"><span class="activity-date">${a.date}</span><span style="color:#F4EBCF">${a.text}</span></div>`).join("")}</div>
+      <div style="display:flex;gap:8px">
+        <input id="note-input" placeholder="Add note…" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(200,164,106,.22);border-radius:8px;color:#F4EBCF;padding:10px 12px;font-family:'Libre Baskerville',serif;font-size:14px;outline:none" onkeydown="if(event.key==='Enter')addNote(${c.id})">
+        <button onclick="addNote(${c.id})" style="background:#C8A46A;color:#1E1509;border:none;border-radius:8px;padding:10px 14px;font-family:'Playfair Display',serif;font-weight:700;font-size:13px;cursor:pointer">Add</button>
+      </div>
+    </div>
+    <!-- Actions -->
+    <div style="display:flex;gap:9px;margin-top:6px">
+      <button class="btn-primary" onclick="openEdit(${c.id})">✏️ Edit</button>
+      <button class="btn-danger" onclick="deleteClient(${c.id})">🗑</button>
+    </div>
+  `;
+  openSheet("detailSheet");
 }
 
-async function insertClient_db(c) {
-  setSyncStatus('saving');
-  try {
-    await sbFetch('/rest/v1/clients', {
-      method: 'POST',
-      prefer: 'return=minimal',
-      body: JSON.stringify(clientToDb(c))
-    });
-    setSyncStatus('saved');
-    setTimeout(() => setSyncStatus('idle'), 2000);
-  } catch(e) {
-    console.error('Insert error:', e);
-    setSyncStatus('error');
-    setTimeout(() => setSyncStatus('idle'), 3000);
-  }
+function addNote(id){
+  const inp=document.getElementById("note-input");
+  const txt=(inp?.value||"").trim();
+  if(!txt)return;
+  const idx=clients.findIndex(c=>c.id===id);
+  if(idx<0)return;
+  clients[idx].activity=[...(clients[idx].activity||[]),{date:todayStr(),text:txt}];
+  saveClient_db(clients[idx]);
+  inp.value="";
+  openDetail(id); // re-render
+  toast("📝 Note added");
 }
 
-async function deleteClient_db(id) {
-  setSyncStatus('saving');
-  try {
-    await sbFetch('/rest/v1/clients?id=eq.' + id, { method: 'DELETE' });
-    setSyncStatus('saved');
-    setTimeout(() => setSyncStatus('idle'), 2000);
-  } catch(e) {
-    console.error('Delete error:', e);
-    setSyncStatus('error');
-  }
+function updateStatus(id,status){
+  const idx=clients.findIndex(c=>c.id===id);
+  if(idx<0)return;
+  clients[idx].status=status;
+  clients[idx].activity=[...(clients[idx].activity||[]),{date:todayStr(),text:"Status → "+(SM[status]?.label||status)}];
+  saveClient_db(clients[idx]);
+  openDetail(id);
+  render();
+  toast("✅ Status updated");
 }
 
-// ── MUTATIONS ──────────────────────────────────────────────────────────────
-function setSyncStatus(s) {
-  const d = document.getElementById('sync-dot');
-  d.className = 'sync-dot ' + s;
+// ── MODAL ──────────────────────────────────────────────────────────────────
+function openAdd(){editId=null;document.getElementById("sheet-title").textContent="New Client";clearForm();populateStatusSelect();updateClassGrid();openSheet("addSheet");}
+function openEdit(id){
+  const c=clients.find(x=>x.id===id);
+  if(!c)return;
+  editId=id;
+  document.getElementById("sheet-title").textContent="Edit Client";
+  document.getElementById("f-name").value=c.name||"";
+  document.getElementById("f-phone").value=c.phone||"";
+  document.getElementById("f-email").value=c.email||"";
+  document.getElementById("f-state").value=c.state||"";
+  document.getElementById("f-ranch").value=c.ranch||"Cotton Mesa";
+  document.getElementById("f-revenue").value=c.revenue||"";
+  document.getElementById("f-deposit").value=c.deposit||"";
+  document.getElementById("f-season").value=c.season||"";
+  document.getElementById("f-party").value=c.party||1;
+  document.getElementById("f-position").value=c.position||"";
+  document.getElementById("f-followup").value=c.followUpDate||"";
+  document.getElementById("f-referral").value=c.referral||"";
+  document.getElementById("f-notes").value=c.notes||"";
+  populateStatusSelect(c.status);
+  updateClassGrid(c.huntClass);
+  closeSheet("detailSheet");
+  openSheet("addSheet");
 }
 
+function populateStatusSelect(selected="inquiry"){
+  const sel=document.getElementById("f-status");
+  sel.innerHTML=STATUSES.map(s=>`<option value="${s.val}"${s.val===selected?" selected":""}>${s.icon} ${s.label}</option>`).join("");
+}
+
+function clearForm(){
+  ["f-name","f-phone","f-email","f-state","f-revenue","f-deposit","f-season","f-referral","f-notes","f-followup"].forEach(id=>{document.getElementById(id).value="";});
+  document.getElementById("f-party").value="1";
+  document.getElementById("f-ranch").value="Cotton Mesa";
+}
+
+function updateClassGrid(selected=""){
+  const ranch=document.getElementById("f-ranch").value;
+  const classes=CLASS_SETS[ranch]||CMR;
+  document.getElementById("classGrid").innerHTML=classes.map(cls=>`
+    <button type="button" class="class-btn${cls.val===selected?" sel":""}" onclick="selectClass(this,'${cls.val.replace(/'/g,"\\'")}')">
+      ${cls.label}
+      <span class="class-btn-sub">${fmt$(cls.price)} · ${cls.score}</span>
+    </button>`).join("");
+  document.getElementById("classGrid").dataset.selected=selected;
+}
+
+function selectClass(btn,val){
+  document.querySelectorAll(".class-btn").forEach(b=>b.classList.remove("sel"));
+  btn.classList.add("sel");
+  document.getElementById("classGrid").dataset.selected=val;
+}
 
 function saveClient(){
   const name=document.getElementById("f-name").value.trim();
@@ -658,9 +894,7 @@ function saveClient(){
     saveClient_db(clients[idx]);
     toast("✅ Updated");
   }else{
-    const newClient={id:nextId++,...data,addedDate:todayStr(),activity:[{date:todayStr(),text:"Added — "+(SM[data.status]?.label||data.status)}]};
-    clients.push(newClient);
-    insertClient_db(newClient);
+    const nc={id:nextId++,...data,addedDate:todayStr(),activity:[{date:todayStr(),text:"Added — "+(SM[data.status]?.label||data.status)}]};clients.push(nc);insertClient_db(nc);
     toast("✅ Client added");
   }
   closeSheet("addSheet");
@@ -676,29 +910,28 @@ function deleteClient(id){
   toast("🗑 Removed");
 }
 
-function updateStatus(id,status){
-  const idx=clients.findIndex(c=>c.id===id);
-  if(idx<0)return;
-  clients[idx].status=status;
-  clients[idx].activity=[...(clients[idx].activity||[]),{date:todayStr(),text:"Status → "+(SM[status]?.label||status)}];
-  saveClient_db(clients[idx]);
-  openDetail(id);
-  render();
-  toast("✅ Status updated");
+// ── SHEETS ─────────────────────────────────────────────────────────────────
+function openSheet(id){document.getElementById(id).classList.add("open");}
+function closeSheet(id){document.getElementById(id).classList.remove("open");}
+// Tap backdrop to close
+document.querySelectorAll(".sheet-overlay").forEach(el=>{
+  el.addEventListener("click",function(e){if(e.target===this)this.classList.remove("open");});
+});
+
+// ── INSTALL ────────────────────────────────────────────────────────────────
+function showInstallInstructions(){closeSheet("installSheet");openSheet("installSheet");}
+function dismissInstall(){document.getElementById("install-banner").classList.remove("show");localStorage.setItem("install-dismissed","1");}
+function checkInstallBanner(){
+  const isInstalled=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone;
+  const dismissed=localStorage.getItem("install-dismissed");
+  if(!isInstalled&&!dismissed){setTimeout(()=>{document.getElementById("install-banner").classList.add("show");},2500);}
 }
 
-function addNote(id){
-  const inp=document.getElementById("note-input");
-  const txt=(inp?.value||"").trim();
-  if(!txt)return;
-  const idx=clients.findIndex(c=>c.id===id);
-  if(idx<0)return;
-  clients[idx].activity=[...(clients[idx].activity||[]),{date:todayStr(),text:txt}];
-  saveClient_db(clients[idx]);
-  inp.value="";
-  openDetail(id);
-  toast("📝 Note added");
+// ── SERVICE WORKER ─────────────────────────────────────────────────────────
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{navigator.serviceWorker.register("/sw.js").catch(e=>console.warn("SW:",e));});
 }
+
 // ── BOOT ───────────────────────────────────────────────────────────────────
 async function boot(){
   await loadData();
